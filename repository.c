@@ -80,11 +80,7 @@ int static gir_repository_load_struct(const gchar *ns_name, GIStructInfo *c_info
 	INIT_CLASS_ENTRY_EX(ce, phpname, strlen(phpname), NULL);
 
 	zend_class_entry *target = zend_register_internal_class(&ce TSRMLS_CC);
-
-	php_printf("our module %d\n", target->module);
-	php_printf("our module %d\n", GIRG(module_number));
-	//target->module = GIRG(module_number);
-
+	target->module = phpext_gir_ptr;
 
 	if (functions) {
 		efree(functions);
