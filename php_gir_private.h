@@ -21,6 +21,8 @@
 
 #include "php_gir.h"
 
+#define GIR_PHP_FENTRY(zend_name, name, arg_info, flags) { zend_name, name, arg_info, (zend_uint) (sizeof(arg_info)/sizeof(struct _zend_arg_info)-1), flags }
+
 /* Lifecycle - Extension */
 PHP_MINIT_FUNCTION(gir);
 PHP_MSHUTDOWN_FUNCTION(gir);

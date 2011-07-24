@@ -30,6 +30,70 @@
 static zend_class_entry *ce_gir_repository;
 
 /**
+ * FFI calls for methods
+ */
+void gir_ffi_call(INTERNAL_FUNCTION_PARAMETERS)
+{
+	php_printf("do ffi call HAHAHA");
+}
+
+/**
+ * Helper Method used to get information for structs to load them into PHP
+ */
+int static gir_repository_load_struct(const gchar *ns_name, GIStructInfo *c_info TSRMLS_DC)
+{
+	size_t pos = 0;
+	gint i = 0;
+	gint n = g_struct_info_get_n_methods (c_info);
+	zend_function_entry *functions = ecalloc(n + 1, sizeof(zend_function_entry));
+	const gchar *object_name = g_base_info_get_name(c_info); // TODO: name should be gir_namespace_class_{class}
+	char *phpname = gir_namespaced_name(ns_name, object_name, TRUE);
+
+	/* If the struct has no methods, it is directly translatable to an associative array
+       so nothing is done with it */
+	if (n < 1) {
+		php_printf("no methods for struct %s, ignoring\n", phpname);
+		return SUCCESS;
+	}
+
+	for (i; i < n; i++) {
+		GIFunctionInfo *m_info = g_struct_info_get_method  (c_info, i);
+		GIFunctionInfoFlags flags = g_function_info_get_flags(m_info);
+
+		if (flags & GI_FUNCTION_IS_METHOD) {
+			const gchar *name = g_base_info_get_name(m_info);
+
+			zend_function_entry fe = { name, gir_ffi_call, NULL, NULL, NULL };
+
+			functions[pos++] = fe;
+		}
+
+		g_base_info_unref(m_info);
+	}
+
+	zend_function_entry empty_fe = {NULL, NULL, NULL};
+	functions[pos] = empty_fe;
+
+	// Init PHP class
+	zend_class_entry ce;
+
+	INIT_CLASS_ENTRY_EX(ce, phpname, strlen(phpname), NULL);
+
+	zend_class_entry *target = zend_register_internal_class(&ce TSRMLS_CC);
+
+	php_printf("our module %d\n", target->module);
+	php_printf("our module %d\n", GIRG(module_number));
+	//target->module = GIRG(module_number);
+
+
+	if (functions) {
+		efree(functions);
+	}
+
+	return SUCCESS;		
+}
+
+/**
  * Helper Method used to get information for constants to load them into PHP
  */
 int static gir_repository_load_constant(const gchar *ns_name, GIConstantInfo *c_info TSRMLS_DC)
@@ -56,7 +120,7 @@ int static gir_repository_load_constant(const gchar *ns_name, GIConstantInfo *c_
         return FAILURE;
 	}
 	zend_register_constant(const_struct TSRMLS_CC);
-	php_printf("registering constant %s", phpname);
+	php_printf("registering constant %s\n", phpname);
 	efree(const_struct);
 
 	return SUCCESS;		
@@ -125,7 +189,7 @@ PHP_METHOD(Repository, importNamespace)
 			break;
 
 			case GI_INFO_TYPE_STRUCT:
-				php_printf("-> struct %s\n", g_base_info_get_name(b_info));
+				gir_repository_load_struct(ns_name, (GIStructInfo *) b_info TSRMLS_CC);
 			break;
 
 			case GI_INFO_TYPE_FUNCTION:
@@ -146,7 +210,7 @@ PHP_METHOD(Repository, importNamespace)
 
 			case GI_INFO_TYPE_CONSTANT:
 				gir_repository_load_constant(ns_name, (GIConstantInfo *) b_info TSRMLS_CC);
-				php_printf("-> constant %s\n", g_base_info_get_name(b_info));
+				/* TODO: keep a list of registered constants? */
 			break;
 
 			case GI_INFO_TYPE_CALLBACK:
