@@ -37,6 +37,19 @@ extern zend_module_entry gir_module_entry;
 # include "TSRM.h"
 #endif
 
+/* Globals */
+ZEND_BEGIN_MODULE_GLOBALS(gir)
+	char *lookyhere;
+ZEND_END_MODULE_GLOBALS(gir)
+
+#ifdef ZTS
+# define GIRG(v) TSRMG(gir_globals_id, zend_gir_globals *, v)
+#else
+# define GIRG(v) (gir_globals.v)
+#endif
+
+ZEND_EXTERN_MODULE_GLOBALS(gir)
+
 #include <girepository.h>
 #include <girffi.h>
 

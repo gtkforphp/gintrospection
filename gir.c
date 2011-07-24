@@ -25,6 +25,18 @@
 
 #include "php_gir_private.h"
 
+ZEND_DECLARE_MODULE_GLOBALS(gir)
+
+PHP_GINIT_FUNCTION(gir) {
+	/* Set things */
+	gir_globals->lookyhere = "Oh hai";
+}
+
+PHP_GSHUTDOWN_FUNCTION(gir) {
+	/* Free things */	
+}
+
+
 /* {{{ gobject_module_entry
  */
 zend_module_entry gir_module_entry = {
@@ -37,7 +49,11 @@ zend_module_entry gir_module_entry = {
 	PHP_RSHUTDOWN(gir),
 	PHP_MINFO(gir),
 	PHP_GIR_VERSION,
-	STANDARD_MODULE_PROPERTIES
+	PHP_MODULE_GLOBALS(gir),
+	PHP_GINIT(gir),
+	PHP_GSHUTDOWN(gir),
+	NULL,
+	STANDARD_MODULE_PROPERTIES_EX
 };
 /* }}} */
 
