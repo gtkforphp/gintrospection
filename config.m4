@@ -23,7 +23,7 @@ if test "$PHP_GIR" != "no"; then
   PHP_SUBST(GIR_SHARED_LIBADD)
   AC_DEFINE(HAVE_GIR, 1, [ ])
 
-  PHP_NEW_EXTENSION(gir, gir.c repository.c, $ext_shared)
+  PHP_NEW_EXTENSION(gir, gir.c repository.c types.c, $ext_shared)
   
   EXT_GIR_HEADERS="php_gir.h"
 

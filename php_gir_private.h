@@ -38,6 +38,8 @@ typedef struct _gir_repository_object {
 	GIRepository *gir;
 } gir_repository_object;
 
+char* gir_namespaced_name(const char *ns_name, const char *name, zend_bool persistent);
+
 #endif	/* PHP_GIR_PRIVATE_EXT_H */
 
 
