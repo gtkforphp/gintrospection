@@ -48,8 +48,7 @@ int static gir_repository_load_constant(const gchar *ns_name, GIConstantInfo *c_
 	const_struct->flags = CONST_CS;
 	const_struct->name = phpname;
 	const_struct->name_len = strlen(phpname) + 1;
-	/* TODO: get real module number for gir in here */
-	const_struct->module_number = 0;
+	const_struct->module_number = GIRG(module_number);
 
 	if (FAILURE ==	gir_types_giargument_to_zval((GITypeInfo *)g_constant_info_get_type(c_info), &giargument, &const_struct->value TSRMLS_CC)) {
 		zend_throw_exception_ex(spl_ce_RuntimeException, 0 TSRMLS_CC, "Could not translate Constant Value");
