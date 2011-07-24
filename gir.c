@@ -29,7 +29,6 @@ ZEND_DECLARE_MODULE_GLOBALS(gir)
 
 PHP_GINIT_FUNCTION(gir) {
 	/* Set things */
-	gir_globals->lookyhere = "Oh hai";
 }
 
 PHP_GSHUTDOWN_FUNCTION(gir) {
@@ -68,6 +67,9 @@ PHP_MINIT_FUNCTION(gir)
 	g_type_init();
 
 	PHP_MINIT(repository)(INIT_FUNC_ARGS_PASSTHRU);
+
+	GIRG(module_number) = module_number;
+
 	return SUCCESS;
 }
 /* }}} */

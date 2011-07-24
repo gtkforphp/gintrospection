@@ -39,7 +39,7 @@ extern zend_module_entry gir_module_entry;
 
 /* Globals */
 ZEND_BEGIN_MODULE_GLOBALS(gir)
-	char *lookyhere;
+	int module_number;
 ZEND_END_MODULE_GLOBALS(gir)
 
 #ifdef ZTS
