@@ -28,6 +28,16 @@ PHP_RINIT_FUNCTION(gir);
 PHP_RSHUTDOWN_FUNCTION(gir);
 PHP_MINFO_FUNCTION(gir);
 
+/* Class lifecycle */
+PHP_MINIT_FUNCTION(repository);
+
+/* Gir\Repository struct */
+typedef struct _gir_repository_object {
+    zend_object std;
+    zend_bool constructed;
+	GIRepository *gir;
+} gir_repository_object;
+
 #endif	/* PHP_GIR_PRIVATE_EXT_H */
 
 

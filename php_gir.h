@@ -20,7 +20,7 @@
 #define PHP_GIR_EXT_H
 
 #define PHP_GIR_VERSION "0.1.0-dev"
-#define GIR_NAMESPACE "GIR"
+#define GIR_NAMESPACE "Gir"
 
 extern zend_module_entry gir_module_entry;
 #define phpext_gir_ptr &gir_module_entry

@@ -49,6 +49,9 @@ ZEND_GET_MODULE(gir)
  */
 PHP_MINIT_FUNCTION(gir)
 {
+	g_type_init();
+
+	PHP_MINIT(repository)(INIT_FUNC_ARGS_PASSTHRU);
 	return SUCCESS;
 }
 /* }}} */
