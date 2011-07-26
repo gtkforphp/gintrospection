@@ -245,9 +245,47 @@ PHP_METHOD(Repository, importNamespace)
 	RETURN_TRUE;
 }
 
+PHP_METHOD(Repository, prependSearchPath)
+{
+	char *path;
+	int  path_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &path, &path_len) 
+			== FAILURE)
+	{
+		return;
+	}
+
+	g_irepository_prepend_search_path(path);
+}
+
+PHP_METHOD(Repository, getSearchPath)
+{
+	gpointer data;
+	GSList   *list;
+	guint    len, i;
+
+	if (zend_parse_parameters_none() == FAILURE)
+		return;
+
+	list = g_irepository_get_search_path();
+	len  = g_slist_length(list);
+
+	array_init(return_value);
+	for (i = 0; i < len; i++)
+	{
+		data = g_slist_nth_data(list, i);
+
+		add_next_index_string(return_value, (char *) data, 1);
+	}
+}
+
+
 /* Register Object */
 static const zend_function_entry gir_repository_methods[] = {
 	PHP_ME(Repository, importNamespace, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Repository, prependSearchPath, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Repository, getSearchPath,   NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
     {NULL, NULL, NULL}
 };
 
