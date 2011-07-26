@@ -21,8 +21,6 @@
 
 #include "php_gir.h"
 
-#define GIR_PHP_FENTRY(zend_name, name, arg_info, flags) { zend_name, name, arg_info, (zend_uint) (sizeof(arg_info)/sizeof(struct _zend_arg_info)-1), flags }
-
 /* Lifecycle - Extension */
 PHP_MINIT_FUNCTION(gir);
 PHP_MSHUTDOWN_FUNCTION(gir);
@@ -33,13 +31,7 @@ PHP_MINFO_FUNCTION(gir);
 /* Class lifecycle */
 PHP_MINIT_FUNCTION(repository);
 
-/* Gir\Repository struct */
-typedef struct _gir_repository_object {
-    zend_object std;
-    zend_bool constructed;
-	GIRepository *gir;
-} gir_repository_object;
-
+/* Internal C API */
 char* gir_namespaced_name(const char *ns_name, const char *name, zend_bool persistent);
 
 #endif	/* PHP_GIR_PRIVATE_EXT_H */

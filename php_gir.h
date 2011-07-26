@@ -39,13 +39,13 @@ extern zend_module_entry gir_module_entry;
 
 /* Globals */
 ZEND_BEGIN_MODULE_GLOBALS(gir)
-	int module_number;
+	HashTable *method_map;
 ZEND_END_MODULE_GLOBALS(gir)
 
 #ifdef ZTS
-# define GIRG(v) TSRMG(gir_globals_id, zend_gir_globals *, v)
+# define GIR_G(v) TSRMG(gir_globals_id, zend_gir_globals *, v)
 #else
-# define GIRG(v) (gir_globals.v)
+# define GIR_G(v) (gir_globals.v)
 #endif
 
 ZEND_EXTERN_MODULE_GLOBALS(gir)

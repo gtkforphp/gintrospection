@@ -26,6 +26,8 @@
 
 #include <ext/spl/spl_exceptions.h>
 
+ZEND_DECLARE_MODULE_GLOBALS(gir)
+
 /* Gir\Repository class information */
 static zend_class_entry *ce_gir_repository;
 
@@ -34,7 +36,28 @@ static zend_class_entry *ce_gir_repository;
  */
 void gir_ffi_call(INTERNAL_FUNCTION_PARAMETERS)
 {
-	php_printf("do ffi call HAHAHA");
+
+	zend_function *active_function = EG(current_execute_data)->function_state.function;
+
+	const char *method_name = active_function->common.function_name;
+	const char *class_name = NULL;
+	const char *value = NULL;
+	
+	if (active_function->common.scope) {
+		class_name = active_function->common.scope->name;
+	}
+
+	if (zend_hash_find(GIR_G(method_map), method_name, strlen(method_name) + 1, (void **) &value) == SUCCESS) {
+    	php_printf("WTF we found %s\n", value);
+    }
+
+
+	if (class_name) {
+		php_printf("Hey! Someone called me! My name is: %s::%s()\n", class_name, method_name);
+
+	} else {
+		php_printf("Hey! Someone called me! My name is: %s()\n", method_name);
+	}
 }
 
 /**
@@ -52,6 +75,7 @@ int static gir_repository_load_struct(const gchar *ns_name, GIStructInfo *c_info
 	/* If the struct has no methods, it is directly translatable to an associative array
        so nothing is done with it */
 	if (n < 1) {
+		efree(functions);
 		php_printf("no methods for struct %s, ignoring\n", phpname);
 		return SUCCESS;
 	}
@@ -62,8 +86,10 @@ int static gir_repository_load_struct(const gchar *ns_name, GIStructInfo *c_info
 
 		if (flags & GI_FUNCTION_IS_METHOD) {
 			const gchar *name = g_base_info_get_name(m_info);
+			char *store = strdup(name);
 
-			zend_function_entry fe = { name, gir_ffi_call, NULL, NULL, NULL };
+			zend_function_entry fe = { name, gir_ffi_call, NULL};
+			zend_hash_add(GIR_G(method_map), store, strlen(store) + 1, (void *) store, strlen(store) + 1, NULL);
 
 			functions[pos++] = fe;
 		}
@@ -74,17 +100,14 @@ int static gir_repository_load_struct(const gchar *ns_name, GIStructInfo *c_info
 	zend_function_entry empty_fe = {NULL, NULL, NULL};
 	functions[pos] = empty_fe;
 
-	// Init PHP class
 	zend_class_entry ce;
 
-	INIT_CLASS_ENTRY_EX(ce, phpname, strlen(phpname), NULL);
+	INIT_CLASS_ENTRY_EX(ce, phpname, strlen(phpname), functions);
 
 	zend_class_entry *target = zend_register_internal_class(&ce TSRMLS_CC);
 	target->module = phpext_gir_ptr;
 
-	if (functions) {
-		efree(functions);
-	}
+	efree(functions);
 
 	return SUCCESS;		
 }
@@ -108,7 +131,7 @@ int static gir_repository_load_constant(const gchar *ns_name, GIConstantInfo *c_
 	const_struct->flags = CONST_CS;
 	const_struct->name = phpname;
 	const_struct->name_len = strlen(phpname) + 1;
-	const_struct->module_number = GIRG(module_number);
+	const_struct->module_number = phpext_gir_ptr.module_number;
 
 	if (FAILURE ==	gir_types_giargument_to_zval((GITypeInfo *)g_constant_info_get_type(c_info), &giargument, &const_struct->value TSRMLS_CC)) {
 		zend_throw_exception_ex(spl_ce_RuntimeException, 0 TSRMLS_CC, "Could not translate Constant Value");
@@ -116,7 +139,6 @@ int static gir_repository_load_constant(const gchar *ns_name, GIConstantInfo *c_
         return FAILURE;
 	}
 	zend_register_constant(const_struct TSRMLS_CC);
-	php_printf("registering constant %s\n", phpname);
 	efree(const_struct);
 
 	return SUCCESS;		

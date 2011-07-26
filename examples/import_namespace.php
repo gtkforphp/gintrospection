@@ -3,4 +3,8 @@ use Gir\Repository;
 
 Repository::importNamespace('GLib');
 
-Reflection::export (new ReflectionExtension('gir'));
+$class = new Gir\Glib\Timer;
+
+var_dump($class);
+
+$class->start();

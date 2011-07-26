@@ -68,8 +68,6 @@ PHP_MINIT_FUNCTION(gir)
 
 	PHP_MINIT(repository)(INIT_FUNC_ARGS_PASSTHRU);
 
-	GIRG(module_number) = module_number;
-
 	return SUCCESS;
 }
 /* }}} */
@@ -86,6 +84,9 @@ PHP_MSHUTDOWN_FUNCTION(gir)
  */
 PHP_RINIT_FUNCTION(gir)
 {
+	ALLOC_HASHTABLE(GIR_G(method_map));
+	zend_hash_init(GIR_G(method_map), 0, NULL, NULL, 1);
+
 	return SUCCESS;
 }
 /* }}} */
@@ -94,6 +95,9 @@ PHP_RINIT_FUNCTION(gir)
  */
 PHP_RSHUTDOWN_FUNCTION(gir)
 {
+	zend_hash_destroy(GIR_G(method_map));
+	FREE_HASHTABLE(GIR_G(method_map));
+
 	return SUCCESS;
 }
 /* }}} */
