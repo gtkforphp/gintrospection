@@ -280,12 +280,28 @@ PHP_METHOD(Repository, getSearchPath)
 	}
 }
 
+PHP_METHOD(Repository, isRegistered)
+{
+	gchar *name,
+		  *version = NULL;
+	guint name_len,
+		  version_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|s", &name, &name_len, 
+				&version, &version_len) == FAILURE)
+	{
+		return;
+	}
+
+	RETURN_BOOL(g_irepository_is_registered(g_irepository_get_default(), name, version));
+}
 
 /* Register Object */
 static const zend_function_entry gir_repository_methods[] = {
 	PHP_ME(Repository, importNamespace, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Repository, prependSearchPath, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Repository, getSearchPath,   NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Repository, isRegistered, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
     {NULL, NULL, NULL}
 };
 
