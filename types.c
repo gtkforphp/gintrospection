@@ -38,6 +38,17 @@ char* gir_namespaced_name(const char *ns_name, const char *name, zend_bool persi
 }
 
 /**
+ * Helpers for sticking items into the Gir namespace
+ */
+char* gir_enum_constant_name(const char *ns_name, const char *constant, const char *name, zend_bool persistent)
+{
+	char *phpname = pemalloc(4 + strlen(ns_name) + strlen(constant) + strlen(name) + 2, persistent);
+	sprintf(phpname, "Gir\\%s\\%s\\%s", ns_name, name, constant);
+
+	return phpname;
+}
+
+/**
  * Helpers for dealing with GIArgument structs
  */
 int gir_types_giargument_to_zval(GITypeInfo *type_info, GIArgument *src, zval *value TSRMLS_DC)
