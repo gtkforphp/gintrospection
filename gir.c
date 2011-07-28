@@ -67,6 +67,7 @@ PHP_MINIT_FUNCTION(gir)
 	g_type_init();
 
 	PHP_MINIT(repository)(INIT_FUNC_ARGS_PASSTHRU);
+	PHP_MINIT(enum)(INIT_FUNC_ARGS_PASSTHRU);
 
 	return SUCCESS;
 }
