@@ -61,6 +61,38 @@ void gir_ffi_call(INTERNAL_FUNCTION_PARAMETERS)
 }
 
 /**
+ * Helper Method used to get information for enums to load them into PHP
+ */
+int static gir_repository_load_enum(const gchar *ns_name, GIEnumInfo *e_info TSRMLS_DC)
+{
+	int i = 0;
+	gint enum_total = 0;
+	zend_class_entry ce;
+	char *phpname = gir_namespaced_name(ns_name, g_base_info_get_name(e_info), TRUE);
+
+	/* TODO: enum base class? */
+	INIT_CLASS_ENTRY_EX(ce, phpname, strlen(phpname), NULL);
+
+	zend_class_entry *target = zend_register_internal_class(&ce TSRMLS_CC);
+	target->module = phpext_gir_ptr;
+
+    enum_total = g_enum_info_get_n_values (e_info);
+	for(i; i < enum_total; i++) {
+		GIValueInfo *current_enum = g_enum_info_get_value(e_info, i);
+		gchar * upper_case = g_utf8_strup(g_base_info_get_name(current_enum), -1);
+
+		/* TODO: properly juggle the g_value_info_get_value to a long
+           ALSO if it's unsigned it'll overflow so use a string instead! */
+		
+		zend_declare_class_constant_long(target, upper_case, strlen(upper_case) + 1, (long) g_value_info_get_value(current_enum));
+
+		g_base_info_unref(current_enum);
+	}
+
+	return SUCCESS;		
+}
+
+/**
  * Helper Method used to get information for structs to load them into PHP
  */
 int static gir_repository_load_struct(const gchar *ns_name, GIStructInfo *c_info TSRMLS_DC)
@@ -214,21 +246,17 @@ PHP_METHOD(Repository, importNamespace)
 				//gobject_girepository_load_function(b_info TSRMLS_CC);
 			break;
 
+			case GI_INFO_TYPE_FLAGS:
 			case GI_INFO_TYPE_ENUM:
-				php_printf("-> enumeration %s\n", g_base_info_get_name(b_info));
+				gir_repository_load_enum(ns_name, (GIEnumInfo *)b_info TSRMLS_CC);
 			break;
 
 			case GI_INFO_TYPE_BOXED:
 				php_printf("-> boxed %s\n", g_base_info_get_name(b_info));
 			break;
 
-			case GI_INFO_TYPE_FLAGS:
-				php_printf("-> flags %s\n", g_base_info_get_name(b_info));
-			break;
-
 			case GI_INFO_TYPE_CONSTANT:
 				gir_repository_load_constant(ns_name, (GIConstantInfo *) b_info TSRMLS_CC);
-				/* TODO: keep a list of registered constants? */
 			break;
 
 			case GI_INFO_TYPE_CALLBACK:
