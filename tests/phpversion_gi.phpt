@@ -1,12 +1,12 @@
 --TEST--
-phpversion('gir') value
+phpversion('gi') value
 --SKIPIF--
 <?php
-if(!extension_loaded('gir')) die('skip - GIR extension not available');
+if(!extension_loaded('gi')) die('skip - GI extension not available');
 ?>
 --FILE--
 <?php
-var_dump(phpversion('gir'));
+var_dump(phpversion('gi'));
 ?>
 --EXPECTF--
 string(%d) "%d.%d.%d%s"

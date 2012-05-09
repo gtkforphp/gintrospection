@@ -2,7 +2,7 @@
   +----------------------------------------------------------------------+
   | PHP Version 5                                                        |
   +----------------------------------------------------------------------+
-  | Copyright (c) 1997-2011 The PHP Group                                |
+  | Copyright (c) 1997-2012 The PHP Group                                |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
@@ -16,25 +16,47 @@
   +----------------------------------------------------------------------+
 */
 
-#ifndef PHP_GIR_PRIVATE_EXT_H
-#define PHP_GIR_PRIVATE_EXT_H
+#ifndef PHP_GI_PRIVATE_EXT_H
+#define PHP_GI_PRIVATE_EXT_H
 
-#include "php_gir.h"
+#include "php_gi.h"
+#include <zend_exceptions.h>
+#include <ext/spl/spl_exceptions.h>
 
 /* Lifecycle - Extension */
-PHP_MINIT_FUNCTION(gir);
-PHP_MSHUTDOWN_FUNCTION(gir);
-PHP_RINIT_FUNCTION(gir);
-PHP_RSHUTDOWN_FUNCTION(gir);
-PHP_MINFO_FUNCTION(gir);
+PHP_MINIT_FUNCTION(gi);
+PHP_MSHUTDOWN_FUNCTION(gi);
+PHP_RINIT_FUNCTION(gi);
+PHP_RSHUTDOWN_FUNCTION(gi);
+PHP_MINFO_FUNCTION(gi);
 
 /* Class lifecycle */
 PHP_MINIT_FUNCTION(repository);
 
-/* Internal C API */
-char* gir_namespaced_name(const char *ns_name, const char *name, zend_bool persistent);
+#define PHP_GI_EXCEPTIONS \
+	zend_error_handling error_handling; \
+	zend_replace_error_handling(EH_THROW, spl_ce_InvalidArgumentException, &error_handling TSRMLS_CC);
 
-#endif	/* PHP_GIR_PRIVATE_EXT_H */
+#define PHP_GI_RESTORE_ERRORS \
+	zend_restore_error_handling(&error_handling TSRMLS_CC);
+
+/* Internal C API */
+char* gi_namespaced_name(const char *ns_name, const char *name, zend_bool persistent);
+
+/* repository info */
+typedef struct _gi_repository_object {
+	zend_object std;
+	zend_bool is_constructed;
+	GIRepository* repo;
+} gi_repository_object;
+
+/* baseinfo object */
+typedef struct _gi_baseinfo_object {
+	zend_object std;
+	zend_bool is_constructed;
+} gi_baseinfo_object;
+
+#endif /* PHP_GI_PRIVATE_EXT_H */
 
 
 /*

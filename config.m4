@@ -2,33 +2,33 @@ dnl
 dnl $Id$
 dnl
 
-PHP_ARG_WITH(gir, Gobject Introspection Library Support,
-[  --with-gir             Enable gir support], yes)
+PHP_ARG_WITH(gi, Gobject Introspection Support,
+[  --with-gi             Enable gi support], yes)
 
-if test "$PHP_GIR" != "no"; then
+if test "$PHP_GI" != "no"; then
 	export OLD_CPPFLAGS="$CPPFLAGS"
 	export CPPFLAGS="$CPPFLAGS $INCLUDES -DHAVE_GIR"
-	
+
 	AC_MSG_CHECKING(PHP version)
 	AC_TRY_COMPILE([#include <php_version.h>], [
-	#if PHP_VERSION_ID < 50300
-	#error this extension requires at least PHP version 5.3.0
+	#if PHP_VERSION_ID < 50400
+	#error this extension requires at least PHP version 5.4.0
 	#endif
 	],
  	[AC_MSG_RESULT(ok)],
-	[AC_MSG_ERROR([need at least PHP 5.3.0])])
-	
+	[AC_MSG_ERROR([need at least PHP 5.4.0])])
+
 	export CPPFLAGS="$OLD_CPPFLAGS"
 
-  PHP_SUBST(GIR_SHARED_LIBADD)
-  AC_DEFINE(HAVE_GIR, 1, [ ])
+  PHP_SUBST(GI_SHARED_LIBADD)
+  AC_DEFINE(HAVE_GI, 1, [ ])
 
-  PHP_NEW_EXTENSION(gir, gir.c repository.c types.c, $ext_shared)
-  
-  EXT_GIR_HEADERS="php_gir.h"
+  PHP_NEW_EXTENSION(gi, gi.c repository.c baseinfo.c, $ext_shared)
+
+  EXT_GIR_HEADERS="php_gi.h"
 
   ifdef([PHP_INSTALL_HEADERS], [
-    PHP_INSTALL_HEADERS(ext/gir, $EXT_GIR_HEADERS)
+    PHP_INSTALL_HEADERS(ext/gi, $EXT_GIR_HEADERS)
   ])
 
   AC_MSG_CHECKING(for pkg-config)
@@ -39,19 +39,19 @@ if test "$PHP_GIR" != "no"; then
 
   if test -f "$PKG_CONFIG"; then
     AC_MSG_RESULT(found)
-    AC_MSG_CHECKING(for gir)
-    
+    AC_MSG_CHECKING(for gi)
+
     if $PKG_CONFIG --exists gobject-introspection-1.0; then
         gir_version_full=`$PKG_CONFIG --modversion gobject-introspection-1.0`
         AC_MSG_RESULT([found $gobject_version_full])
-        GIR_LIBS="$LDFLAGS `$PKG_CONFIG --libs gobject-introspection-1.0`"
-        GIR_INCS="$CFLAGS `$PKG_CONFIG --cflags-only-I gobject-introspection-1.0`"
-        PHP_EVAL_INCLINE($GIR_INCS)
-        PHP_EVAL_LIBLINE($GIR_LIBS, GIR_SHARED_LIBADD)
-        AC_DEFINE(HAVE_GIR, 1, [whether gir exists in the system])
+        GI_LIBS="$LDFLAGS `$PKG_CONFIG --libs gobject-introspection-1.0`"
+        GI_INCS="$CFLAGS `$PKG_CONFIG --cflags-only-I gobject-introspection-1.0`"
+        PHP_EVAL_INCLINE($GI_INCS)
+        PHP_EVAL_LIBLINE($GI_LIBS, GI_SHARED_LIBADD)
+        AC_DEFINE(HAVE_GI, 1, [whether gi exists in the system])
     else
         AC_MSG_RESULT(not found)
-        AC_MSG_ERROR(Ooops ! no gobject introspection - gir detected in the system)
+        AC_MSG_ERROR(Ooops ! no gobject introspection - gi detected in the system)
     fi
   else
     AC_MSG_RESULT(not found)

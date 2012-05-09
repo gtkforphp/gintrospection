@@ -1,18 +1,17 @@
 --TEST--
-Gir\Repository->__construct
+G\Introspection\Repository->__construct();
 --SKIPIF--
 <?php
-if(!extension_loaded('gir')) die('skip - GIR extension not available');
+if(!extension_loaded('gi')) die('skip - GI extension not available');
 ?>
 --FILE--
 <?php
-class Foo extends TestClass {
-     public function __construct() {
-	}
-}
-//$class = new TestClass;
-//$class = new Foo;
+use G\Introspection\Repository as Gir;
+
+// constructor is private and instantiation will fail
+$repo = new Gir();
 
 
 ?>
 --EXPECTF--
+Fatal error: Call to private G\Introspection\Repository::__construct() from invalid context in %s on line %d

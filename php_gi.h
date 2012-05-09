@@ -2,7 +2,7 @@
   +----------------------------------------------------------------------+
   | PHP Version 5                                                        |
   +----------------------------------------------------------------------+
-  | Copyright (c) 1997-2011 The PHP Group                                |
+  | Copyright (c) 1997-2012 The PHP Group                                |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
@@ -16,21 +16,21 @@
   +----------------------------------------------------------------------+
 */
 
-#ifndef PHP_GIR_EXT_H
-#define PHP_GIR_EXT_H
+#ifndef PHP_GI_EXT_H
+#define PHP_GIREXT_H
 
-#define PHP_GIR_VERSION "0.1.0-dev"
-#define GIR_NAMESPACE "Gir"
+#define PHP_GI_VERSION "0.1.0-dev"
+#define GI_NAMESPACE ZEND_NS_NAME("G", "Introspection")
 
-extern zend_module_entry gir_module_entry;
-#define phpext_gir_ptr &gir_module_entry
+extern zend_module_entry gi_module_entry;
+#define phpext_gi_ptr &gi_module_entry
 
 #ifdef PHP_WIN32
-# define PHP_GIR_API __declspec(dllexport)
+# define PHP_GI_API __declspec(dllexport)
 #elif defined(__GNUC__) && __GNUC__ >= 4
-# define PHP_GIR_API __attribute__ ((visibility("default")))
+# define PHP_GI_API __attribute__ ((visibility("default")))
 #else
-# define PHP_GIR
+# define PHP_GI
 #endif
 
 #ifdef ZTS
@@ -38,22 +38,22 @@ extern zend_module_entry gir_module_entry;
 #endif
 
 /* Globals */
-ZEND_BEGIN_MODULE_GLOBALS(gir)
+ZEND_BEGIN_MODULE_GLOBALS(gi)
 	HashTable *method_map;
-ZEND_END_MODULE_GLOBALS(gir)
+ZEND_END_MODULE_GLOBALS(gi)
 
 #ifdef ZTS
-# define GIR_G(v) TSRMG(gir_globals_id, zend_gir_globals *, v)
+# define GI_G(v) TSRMG(gi_globals_id, zend_gi_globals *, v)
 #else
-# define GIR_G(v) (gir_globals.v)
+# define GI_G(v) (gi_globals.v)
 #endif
 
-ZEND_EXTERN_MODULE_GLOBALS(gir)
+ZEND_EXTERN_MODULE_GLOBALS(gi)
 
 #include <girepository.h>
 #include <girffi.h>
 
-#endif	/* PHP_GIR_EXT_H */
+#endif /* PHP_GI_EXT_H */
 
 
 /*

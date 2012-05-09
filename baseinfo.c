@@ -123,8 +123,7 @@ static void gi_baseinfo_object_free(void *object TSRMLS_DC)
 }
 /* }}} */
 
-/* {{{ gi_basinfo_object_create
-object that has an internal HANDLE stored */
+/* {{{ gi_basinfo_object_create */
 static zend_object_value gi_baseinfo_object_create(zend_class_entry *ce TSRMLS_DC)
 {
 	zend_object_value retval;
