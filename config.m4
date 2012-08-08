@@ -1,13 +1,9 @@
-dnl
-dnl $Id$
-dnl
-
 PHP_ARG_WITH(gi, Gobject Introspection Support,
 [  --with-gi             Enable gi support], yes)
 
 if test "$PHP_GI" != "no"; then
 	export OLD_CPPFLAGS="$CPPFLAGS"
-	export CPPFLAGS="$CPPFLAGS $INCLUDES -DHAVE_GIR"
+	export CPPFLAGS="$CPPFLAGS $INCLUDES -DHAVE_GI"
 
 	AC_MSG_CHECKING(PHP version)
 	AC_TRY_COMPILE([#include <php_version.h>], [
@@ -58,4 +54,3 @@ if test "$PHP_GI" != "no"; then
     AC_MSG_ERROR(Ooops ! no pkg-config found .... )
   fi
 fi
-

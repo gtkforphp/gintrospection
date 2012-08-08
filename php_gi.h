@@ -17,7 +17,7 @@
 */
 
 #ifndef PHP_GI_EXT_H
-#define PHP_GIREXT_H
+#define PHP_GI_EXT_H
 
 #define PHP_GI_VERSION "0.1.0-dev"
 #define GI_NAMESPACE ZEND_NS_NAME("G", "Introspection")
@@ -54,7 +54,6 @@ ZEND_EXTERN_MODULE_GLOBALS(gi)
 #include <girffi.h>
 
 #endif /* PHP_GI_EXT_H */
-
 
 /*
  * Local variables:

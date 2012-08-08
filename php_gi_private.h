@@ -58,7 +58,6 @@ typedef struct _gi_baseinfo_object {
 
 #endif /* PHP_GI_PRIVATE_EXT_H */
 
-
 /*
  * Local variables:
  * tab-width: 4
