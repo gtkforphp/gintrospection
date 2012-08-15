@@ -16,41 +16,41 @@ if test "$PHP_GI" != "no"; then
 
 	export CPPFLAGS="$OLD_CPPFLAGS"
 
-  PHP_SUBST(GI_SHARED_LIBADD)
-  AC_DEFINE(HAVE_GI, 1, [ ])
+	PHP_SUBST(GI_SHARED_LIBADD)
+	AC_DEFINE(HAVE_GI, 1, [ ])
 
-  PHP_NEW_EXTENSION(gi, gi.c repository.c baseinfo.c, $ext_shared)
+	PHP_NEW_EXTENSION(gi, gi.c repository.c baseinfo.c, $ext_shared)
 
-  EXT_GIR_HEADERS="php_gi.h"
+	EXT_GIR_HEADERS="php_gi.h"
 
-  ifdef([PHP_INSTALL_HEADERS], [
-    PHP_INSTALL_HEADERS(ext/gi, $EXT_GIR_HEADERS)
-  ])
+	ifdef([PHP_INSTALL_HEADERS], [
+		PHP_INSTALL_HEADERS(ext/gi, $EXT_GIR_HEADERS)
+	])
 
-  AC_MSG_CHECKING(for pkg-config)
+	AC_MSG_CHECKING(for pkg-config)
 
-  if test ! -f "$PKG_CONFIG"; then
-    PKG_CONFIG=`which pkg-config`
-  fi
+	if test ! -f "$PKG_CONFIG"; then
+		PKG_CONFIG=`which pkg-config`
+	fi
 
-  if test -f "$PKG_CONFIG"; then
-    AC_MSG_RESULT(found)
-    AC_MSG_CHECKING(for gi)
+	if test -f "$PKG_CONFIG"; then
+		AC_MSG_RESULT(found)
+		AC_MSG_CHECKING(for gi)
 
-    if $PKG_CONFIG --exists gobject-introspection-1.0; then
-        gir_version_full=`$PKG_CONFIG --modversion gobject-introspection-1.0`
-        AC_MSG_RESULT([found $gobject_version_full])
-        GI_LIBS="$LDFLAGS `$PKG_CONFIG --libs gobject-introspection-1.0`"
-        GI_INCS="$CFLAGS `$PKG_CONFIG --cflags-only-I gobject-introspection-1.0`"
-        PHP_EVAL_INCLINE($GI_INCS)
-        PHP_EVAL_LIBLINE($GI_LIBS, GI_SHARED_LIBADD)
-        AC_DEFINE(HAVE_GI, 1, [whether gi exists in the system])
-    else
-        AC_MSG_RESULT(not found)
-        AC_MSG_ERROR(Ooops ! no gobject introspection - gi detected in the system)
-    fi
-  else
-    AC_MSG_RESULT(not found)
-    AC_MSG_ERROR(Ooops ! no pkg-config found .... )
-  fi
+	if $PKG_CONFIG --exists gobject-introspection-1.0; then
+		gir_version_full=`$PKG_CONFIG --modversion gobject-introspection-1.0`
+		AC_MSG_RESULT([found $gobject_version_full])
+		GI_LIBS="$LDFLAGS `$PKG_CONFIG --libs gobject-introspection-1.0`"
+		GI_INCS="$CFLAGS `$PKG_CONFIG --cflags-only-I gobject-introspection-1.0`"
+		PHP_EVAL_INCLINE($GI_INCS)
+		PHP_EVAL_LIBLINE($GI_LIBS, GI_SHARED_LIBADD)
+		AC_DEFINE(HAVE_GI, 1, [whether gi exists in the system])
+	else
+		AC_MSG_RESULT(not found)
+		AC_MSG_ERROR(Ooops ! no gobject introspection - gi detected in the system)
+	fi
+	else
+		AC_MSG_RESULT(not found)
+		AC_MSG_ERROR(Ooops ! no pkg-config found .... )
+	fi
 fi
