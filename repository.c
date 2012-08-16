@@ -46,6 +46,10 @@ ZEND_BEGIN_ARG_INFO(Repository_require_args, ZEND_SEND_BY_VAL)
 	ZEND_ARG_INFO(0, namespace)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO(Repository_dump_args, ZEND_SEND_BY_VAL)
+	ZEND_ARG_INFO(0, files)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO(Repository_enumerateVersions_args, ZEND_SEND_BY_VAL)
 	ZEND_ARG_INFO(0, namespace)
 ZEND_END_ARG_INFO()
@@ -157,7 +161,7 @@ PHP_METHOD(Repository, getCPrefix)
 	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	/* This will bomb and segfault!! if we don't check to make sure the typelib is loaded */
-	if (0 == g_irepository_is_registered(repository_object->repo, name, NULL)) {
+	if (FALSE == g_irepository_is_registered(repository_object->repo, name, NULL)) {
 		zend_throw_exception_ex(spl_ce_InvalidArgumentException, 0 TSRMLS_CC,
 								"Namespace %s is not currently loaded", name);
 		return;
@@ -205,6 +209,37 @@ PHP_METHOD(Repository, require)
 }
 /* }}} */
 
+/* {{{ proto void G\Introspection\Repository::dump(string $files)
+                   Argument specified is a comma-separated pair of filenames;
+                   i.e. of the form "input.txt,output.xml".
+                   The input file should be a UTF-8 Unix-line-ending text file,
+                   with each line containing the name of a GType _get_type function.
+                   The output file should already exist, but be empty. This function
+                   will overwrite its contents. */
+PHP_METHOD(Repository, dump)
+{
+
+	gchar *files;
+	int files_len;
+	gboolean worked = FALSE;
+	GError *error = NULL;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &files, &files_len)) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	worked = g_irepository_dump(files, &error);
+
+	if (php_g_handle_gerror(&error TSRMLS_CC)) {
+		RETURN_FALSE;
+	}
+
+	RETURN_BOOL(worked);
+}
+/* }}} */
+
 /* {{{ proto void G\Introspection\Repository->enumerateVersions(string $namespace)
                   Options a list of loaded and available versions for a namespace */
 PHP_METHOD(Repository, enumerateVersions)
@@ -223,7 +258,7 @@ PHP_METHOD(Repository, enumerateVersions)
 
 	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
-	versions = g_irepository_enumerate_versions (repository_object->repo, name);
+	versions = g_irepository_enumerate_versions(repository_object->repo, name);
 
 	array_init(return_value);
 
@@ -287,6 +322,7 @@ static const zend_function_entry gi_repository_methods[] = {
 	PHP_ME(Repository, isRegistered, Repository_isRegistered_args, ZEND_ACC_PUBLIC )
 	PHP_ME(Repository, getCPrefix, Repository_getCPrefix_args, ZEND_ACC_PUBLIC )
 	PHP_ME(Repository, require, NULL, ZEND_ACC_PUBLIC )
+	PHP_ME(Repository, dump, Repository_dump_args, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC )
 	PHP_ME(Repository, enumerateVersions, Repository_enumerateVersions_args, ZEND_ACC_PUBLIC )
 	ZEND_FE_END
 };
