@@ -28,6 +28,13 @@
 #include <girepository.h>
 #include <girffi.h>
 
+/* typelib info */
+struct _gi_typelib_object {
+	zend_object std;
+	zend_bool is_constructed;
+	GITypelib* typelib;
+};
+
 #define PHP_GI_EXCEPTIONS \
 	zend_error_handling error_handling; \
 	zend_replace_error_handling(EH_THROW, spl_ce_InvalidArgumentException, &error_handling TSRMLS_CC);

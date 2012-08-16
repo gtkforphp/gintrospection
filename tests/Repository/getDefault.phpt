@@ -18,6 +18,8 @@ try {
 }
 
 ?>
+= DONE =
 --EXPECT--
 bool(true)
 G\Introspection\Repository::getDefault() expects exactly 0 parameters, 1 given
+= DONE =

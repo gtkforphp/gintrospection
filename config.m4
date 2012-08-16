@@ -20,15 +20,24 @@ if test "$PHP_GI" != "no"; then
 	PHP_SUBST(GI_SHARED_LIBADD)
 	AC_DEFINE(HAVE_GI, 1, [ ])
 
-	PHP_NEW_EXTENSION(gi, gi.c repository.c baseinfo.c, $ext_shared)
+	PHP_NEW_EXTENSION(gi, gi.c repository.c typelib.c baseinfo.c, $ext_shared)
 
-	EXT_GIR_HEADERS="php_gi.h"
+	EXT_GIR_HEADERS="php_gi_public.h"
 
 	ifdef([PHP_INSTALL_HEADERS], [
 		PHP_INSTALL_HEADERS(ext/gi, $EXT_GIR_HEADERS)
 	])
 
 	PHP_ADD_EXTENSION_DEP(gi, g)
+
+	AC_MSG_CHECKING(for g gtkforphp extension)
+	if test -f "$phpincludedir/ext/g/php_g_public.h"; then
+		PHP_ADD_INCLUDE($phpincludedir/ext/g)
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
+		AC_MSG_ERROR(g gtkforphp extension not found.)
+	fi
 
 	AC_MSG_CHECKING(for pkg-config)
 

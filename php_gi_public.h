@@ -48,10 +48,11 @@
 
 typedef struct _gi_repository_object gi_repository_object;
 typedef struct _gi_baseinfo_object gi_baseinfo_object;
+typedef struct _gi_typelib_object gi_typelib_object;
 
-PHP_GI_API zend_class_entry *ce_gi_repository;
-PHP_GI_API zend_class_entry *ce_gi_typelib;
-PHP_GI_API zend_class_entry *ce_gi_baseinfo;
+extern PHP_GI_API zend_class_entry *ce_gi_repository;
+extern PHP_GI_API zend_class_entry *ce_gi_typelib;
+extern PHP_GI_API zend_class_entry *ce_gi_baseinfo;
 
 #endif /* PHP_GI_PUBLIC_EXT_H */
 

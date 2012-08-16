@@ -17,6 +17,7 @@
 */
 
 #include "php_gi.h"
+#include <php_g_public.h>
 
 zend_class_entry *ce_gi_repository;
 static zend_object_handlers gi_repository_object_handlers;
@@ -32,12 +33,6 @@ struct _gi_repository_object {
     G\Introspection\Repository class API
 ------------------------------------------------------------------*/
 
-ZEND_BEGIN_ARG_INFO(Repository___construct_args, ZEND_SEND_BY_VAL)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO(Repository_getDefault_args, ZEND_SEND_BY_VAL)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_INFO_EX(Repository_isRegistered_args, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
 	ZEND_ARG_INFO(0, namespace)
 	ZEND_ARG_INFO(0, version)
@@ -48,6 +43,10 @@ ZEND_BEGIN_ARG_INFO(Repository_getCPrefix_args, ZEND_SEND_BY_VAL)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO(Repository_require_args, ZEND_SEND_BY_VAL)
+	ZEND_ARG_INFO(0, namespace)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO(Repository_enumerateVersions_args, ZEND_SEND_BY_VAL)
 	ZEND_ARG_INFO(0, namespace)
 ZEND_END_ARG_INFO()
 
@@ -70,7 +69,7 @@ PHP_METHOD(Repository, getDefault)
 }
 /* }}} */
 
-/* {{{ proto void Repository__construct()
+/* {{{ proto void Repository->__construct()
 Private constructor placeholder (does nothing) */
 PHP_METHOD(Repository, __construct)
 {
@@ -174,6 +173,7 @@ PHP_METHOD(Repository, require)
 {
 
 	gi_repository_object *repository_object;
+	gi_typelib_object *typelib_object;
 	gchar *name, *version = NULL;
 	int name_len, version_len;
 	GITypelib *typelib;
@@ -186,16 +186,52 @@ PHP_METHOD(Repository, require)
 	}
 	PHP_GI_RESTORE_ERRORS
 
+	object_init_ex(return_value, ce_gi_typelib);
+
 	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	typelib_object = (gi_typelib_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	typelib_object->is_constructed = TRUE;
 
-	typelib = g_irepository_require(repository_object->repo, name, version,
-									  G_IREPOSITORY_LOAD_FLAG_LAZY, &error);
+	typelib_object->typelib = g_irepository_require(repository_object->repo, name, version,
+									G_IREPOSITORY_LOAD_FLAG_LAZY, &error);
 
-	if(typelib) {
-		RETURN_TRUE;
-	} else {
+	if (php_g_handle_gerror(&error TSRMLS_CC)) {
 		RETURN_FALSE;
 	}
+
+	if(!typelib_object->typelib) {
+		RETURN_FALSE;
+	}
+}
+/* }}} */
+
+/* {{{ proto void G\Introspection\Repository->enumerateVersions(string $namespace)
+                  Options a list of loaded and available versions for a namespace */
+PHP_METHOD(Repository, enumerateVersions)
+{
+
+	gi_repository_object *repository_object;
+	gchar *name;
+	int name_len;
+	GList *versions, *item;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	versions = g_irepository_enumerate_versions (repository_object->repo, name);
+
+	array_init(return_value);
+
+	for (item = versions; item; item = item->next) {
+		add_next_index_string(return_value, item->data, 1);
+	}
+
+	g_list_free(versions);
 }
 /* }}} */
 
@@ -203,7 +239,7 @@ PHP_METHOD(Repository, require)
     G\Introspection\Repository Object management
 ------------------------------------------------------------------*/
 
-/* {{{ gi_baseinfo_object_free */
+/* {{{ gi_repository_object_free */
 static void gi_repository_object_free(void *object TSRMLS_DC)
 {
 	gi_repository_object *repository_object = (gi_repository_object *)object;
@@ -236,26 +272,31 @@ static zend_object_value gi_repository_object_create(zend_class_entry *ce TSRMLS
 	retval.handlers = &gi_repository_object_handlers;
 	return retval;
 }
+/* }}} */
 
 /* ----------------------------------------------------------------
     G\Introspection\Repository Definition and registration
 ------------------------------------------------------------------*/
 
+/* {{{ class methods */
 static const zend_function_entry gi_repository_methods[] = {
-	PHP_ME(Repository, __construct, Repository___construct_args, ZEND_ACC_PRIVATE|ZEND_ACC_CTOR)
-	PHP_ME(Repository, getDefault, Repository_getDefault_args, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Repository, __construct, NULL, ZEND_ACC_PRIVATE|ZEND_ACC_CTOR)
+	PHP_ME(Repository, getDefault, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Repository, prependSearchPath, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Repository, getSearchPath,   NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Repository, isRegistered, Repository_isRegistered_args, ZEND_ACC_PUBLIC )
 	PHP_ME(Repository, getCPrefix, Repository_getCPrefix_args, ZEND_ACC_PUBLIC )
 	PHP_ME(Repository, require, NULL, ZEND_ACC_PUBLIC )
+	PHP_ME(Repository, enumerateVersions, Repository_enumerateVersions_args, ZEND_ACC_PUBLIC )
 	ZEND_FE_END
 };
+/* }}} */
 
+/* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(Repository)
 {
 	zend_class_entry ce;
-	INIT_CLASS_ENTRY(ce, ZEND_NS_NAME(GI_NAMESPACE, "Repository"), gi_repository_methods);
+	INIT_NS_CLASS_ENTRY(ce, GI_NAMESPACE, "Repository", gi_repository_methods);
 	ce_gi_repository = zend_register_internal_class(&ce TSRMLS_CC);
 
 	ce_gi_repository->create_object = gi_repository_object_create;
@@ -263,7 +304,7 @@ PHP_MINIT_FUNCTION(Repository)
 
 	return SUCCESS;
 }
-
+/* }}} */
 
 /*
  * Local variables:
