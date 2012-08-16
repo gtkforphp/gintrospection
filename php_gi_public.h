@@ -16,29 +16,44 @@
   +----------------------------------------------------------------------+
 */
 
-#ifndef PHP_GI_EXT_H
-#define PHP_GI_EXT_H
+#ifndef PHP_GI_PUBLIC_EXT_H
+#define PHP_GI_PUBLIC_EXT_H
 
-#include "php_gi_public.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
-#include <ext/standard/info.h>
-#include <zend_exceptions.h>
-#include <ext/spl/spl_exceptions.h>
+#ifdef ZTS
+# include "TSRM.h"
+#endif
 
-#include <girepository.h>
-#include <girffi.h>
+#include <php.h>
 
-#define PHP_GI_EXCEPTIONS \
-	zend_error_handling error_handling; \
-	zend_replace_error_handling(EH_THROW, spl_ce_InvalidArgumentException, &error_handling TSRMLS_CC);
+#ifdef PHP_WIN32
+#  ifdef GI_EXPORTS
+#    define PHP_GI_API __declspec(dllexport)
+#  elif defined(COMPILE_DL_G)
+#    define PHP_GI_API __declspec(dllimport)
+#  else
+#    define PHP_GI_API /* nothing special */
+#  endif
+#elif defined(__GNUC__) && __GNUC__ >= 4
+#  define PHP_GI_API __attribute__ ((visibility("default")))
+#else
+#  define PHP_GI_API
+#endif
 
-#define PHP_GI_RESTORE_ERRORS \
-	zend_restore_error_handling(&error_handling TSRMLS_CC);
+#define PHP_GI_VERSION "0.1.0-dev"
+#define GI_NAMESPACE ZEND_NS_NAME("G", "Introspection")
 
-extern zend_module_entry gi_module_entry;
-#define phpext_gi_ptr &gi_module_entry
+typedef struct _gi_repository_object gi_repository_object;
+typedef struct _gi_baseinfo_object gi_baseinfo_object;
 
-#endif /* PHP_GI_EXT_H */
+PHP_GI_API zend_class_entry *ce_gi_repository;
+PHP_GI_API zend_class_entry *ce_gi_typelib;
+PHP_GI_API zend_class_entry *ce_gi_baseinfo;
+
+#endif /* PHP_GI_PUBLIC_EXT_H */
 
 /*
  * Local variables:

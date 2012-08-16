@@ -1,5 +1,5 @@
 --TEST--
-G\Introspection\Repository::getSearchPath
+G\Introspection\Repository->getSearchPath
 --SKIPIF--
 <?php
 if(!extension_loaded('gi')) die('skip - GI extension not available');
@@ -8,7 +8,7 @@ if(!extension_loaded('gi')) die('skip - GI extension not available');
 <?php
 use G\Introspection\Repository;
 
-echo gettype(Repository::getSearchPath());
+echo gettype(Repository->getSearchPath());
 ?>
 --EXPECT--
 array

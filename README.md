@@ -13,6 +13,9 @@ This is still an experimental extension.
 Installing/Configuring
 ======================
 
+This extension requires the gtkforphp/g extension as a dependency - for more information see
+https://github.com/gtkforphp/g
+
 This extension requires the gobject introspection library development files.  You can build the package
 manually or use your system's package manager.  For example on ubuntu use
 

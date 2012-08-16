@@ -19,6 +19,13 @@
 #ifndef PHP_GI_PRIVATE_EXT_H
 #define PHP_GI_PRIVATE_EXT_H
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <php.h>
+#include <ext/standard/info.h>
+
 #include "php_gi.h"
 #include <zend_exceptions.h>
 #include <ext/spl/spl_exceptions.h>

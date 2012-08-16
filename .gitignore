@@ -53,3 +53,4 @@ tests/*/*.exp
 tests/*/*.log
 tests/*/*.sh
 run-tests.php
+/php-cli.ini

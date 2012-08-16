@@ -1,5 +1,5 @@
 --TEST--
-gi phpinfo information
+gi extension dependencies
 --SKIPIF--
 <?php
 if(!extension_loaded('gi')) die('skip - GI extension not available');
@@ -7,12 +7,12 @@ if(!extension_loaded('gi')) die('skip - GI extension not available');
 --FILE--
 <?php
 $ext = new ReflectionExtension('gi');
-$ext->info();
+var_dump($ext->getDependencies());
 ?>
 = DONE =
---EXPECTF--
-gi
-
-Gobject Introspection support => enabled
-Extension Version => %d.%d.%d%s
+--EXPECT--
+array(1) {
+  ["g"]=>
+  string(8) "Required"
+}
 = DONE =

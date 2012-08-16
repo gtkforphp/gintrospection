@@ -16,16 +16,17 @@
   +----------------------------------------------------------------------+
 */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-#include <php.h>
-#include "php_gi_private.h"
+#include "php_gi.h"
 
 zend_class_entry *ce_gi_baseinfo;
 static zend_object_handlers gi_baseinfo_object_handlers;
 static zend_function gi_baseinfo_constructor_wrapper;
+
+/* baseinfo object */
+struct _gi_baseinfo_object {
+	zend_object std;
+	zend_bool is_constructed;
+};
 
 /* ----------------------------------------------------------------
     gi\BaseInfo class API

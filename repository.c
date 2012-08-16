@@ -16,15 +16,17 @@
   +----------------------------------------------------------------------+
 */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-#include <php.h>
-#include "php_gi_private.h"
+#include "php_gi.h"
 
 zend_class_entry *ce_gi_repository;
 static zend_object_handlers gi_repository_object_handlers;
+
+/* repository info */
+struct _gi_repository_object {
+	zend_object std;
+	zend_bool is_constructed;
+	GIRepository* repo;
+};
 
 /* ----------------------------------------------------------------
     G\Introspection\Repository class API
@@ -37,8 +39,16 @@ ZEND_BEGIN_ARG_INFO(Repository_getDefault_args, ZEND_SEND_BY_VAL)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(Repository_isRegistered_args, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
-	ZEND_ARG_INFO(0, name)
+	ZEND_ARG_INFO(0, namespace)
 	ZEND_ARG_INFO(0, version)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO(Repository_getCPrefix_args, ZEND_SEND_BY_VAL)
+	ZEND_ARG_INFO(0, namespace)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO(Repository_require_args, ZEND_SEND_BY_VAL)
+	ZEND_ARG_INFO(0, namespace)
 ZEND_END_ARG_INFO()
 
 /* {{{ proto Repository object Repository::getDefault()
@@ -107,6 +117,9 @@ PHP_METHOD(Repository, getSearchPath)
 	}
 }
 
+/* {{{ proto void G\Introspection\Repository->isRegistered(string $namespace[, string $version])
+                  Allows you to check if a namespace has been registered, and optionally a specific
+                  version of a namespace as well */
 PHP_METHOD(Repository, isRegistered)
 {
 
@@ -125,6 +138,66 @@ PHP_METHOD(Repository, isRegistered)
 
 	RETURN_BOOL(g_irepository_is_registered(repository_object->repo, name, version));
 }
+/* }}} */
+
+/* {{{ proto void G\Introspection\Repository->getCPrefix(string $namespace)
+                  Gets the C namespace of a loaded repository */
+PHP_METHOD(Repository, getCPrefix)
+{
+
+	gi_repository_object *repository_object;
+	gchar *name;
+	int name_len;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	/* This will bomb and segfault!! if we don't check to make sure the typelib is loaded */
+	if (0 == g_irepository_is_registered(repository_object->repo, name, NULL)) {
+		zend_throw_exception_ex(spl_ce_InvalidArgumentException, 0 TSRMLS_CC,
+								"Namespace %s is not currently loaded", name);
+		return;
+	}
+
+	RETURN_STRING(g_irepository_get_c_prefix(repository_object->repo, name), 1);
+}
+/* }}} */
+
+/* {{{ proto void G\Introspection\Repository->require(string $namespace, string $version)
+                  Tries to load a namespace typelib, returns the typelib object or false */
+PHP_METHOD(Repository, require)
+{
+
+	gi_repository_object *repository_object;
+	gchar *name, *version = NULL;
+	int name_len, version_len;
+	GITypelib *typelib;
+	GError *error = NULL;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|s", &name, &name_len,
+				&version, &version_len)) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	typelib = g_irepository_require(repository_object->repo, name, version,
+									  G_IREPOSITORY_LOAD_FLAG_LAZY, &error);
+
+	if(typelib) {
+		RETURN_TRUE;
+	} else {
+		RETURN_FALSE;
+	}
+}
+/* }}} */
 
 /* ----------------------------------------------------------------
     G\Introspection\Repository Object management
@@ -174,7 +247,9 @@ static const zend_function_entry gi_repository_methods[] = {
 	PHP_ME(Repository, prependSearchPath, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Repository, getSearchPath,   NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Repository, isRegistered, Repository_isRegistered_args, ZEND_ACC_PUBLIC )
-	{NULL, NULL, NULL}
+	PHP_ME(Repository, getCPrefix, Repository_getCPrefix_args, ZEND_ACC_PUBLIC )
+	PHP_ME(Repository, require, NULL, ZEND_ACC_PUBLIC )
+	ZEND_FE_END
 };
 
 PHP_MINIT_FUNCTION(Repository)

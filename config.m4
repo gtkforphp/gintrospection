@@ -2,6 +2,7 @@ PHP_ARG_WITH(gi, Gobject Introspection Support,
 [  --with-gi             Enable gi support], yes)
 
 if test "$PHP_GI" != "no"; then
+
 	export OLD_CPPFLAGS="$CPPFLAGS"
 	export CPPFLAGS="$CPPFLAGS $INCLUDES -DHAVE_GI"
 
@@ -26,6 +27,8 @@ if test "$PHP_GI" != "no"; then
 	ifdef([PHP_INSTALL_HEADERS], [
 		PHP_INSTALL_HEADERS(ext/gi, $EXT_GIR_HEADERS)
 	])
+
+	PHP_ADD_EXTENSION_DEP(gi, g)
 
 	AC_MSG_CHECKING(for pkg-config)
 
