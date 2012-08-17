@@ -54,8 +54,20 @@ ZEND_BEGIN_ARG_INFO(Repository_enumerateVersions_args, ZEND_SEND_BY_VAL)
 	ZEND_ARG_INFO(0, namespace)
 ZEND_END_ARG_INFO()
 
-/* {{{ proto Repository object Repository::getDefault()
- Singleton constructor for process specific default repository */
+/* {{{ proto void Repository->__construct()
+                 Private constructor placeholder (does nothing) */
+PHP_METHOD(Repository, __construct)
+{
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+}
+/* }}} */
+
+/* {{{ proto object Repository::getDefault()
+                    Singleton constructor for process specific default repository */
 PHP_METHOD(Repository, getDefault)
 {
 	gi_repository_object *repository_object;
@@ -73,40 +85,37 @@ PHP_METHOD(Repository, getDefault)
 }
 /* }}} */
 
-/* {{{ proto void Repository->__construct()
-Private constructor placeholder (does nothing) */
-PHP_METHOD(Repository, __construct)
-{
-	PHP_GI_EXCEPTIONS
-	if (FAILURE == zend_parse_parameters_none()) {
-		return;
-	}
-	PHP_GI_RESTORE_ERRORS
-}
-/* }}} */
 
+/* {{{ proto void Repository::prependSearchPath()
+                  adds a search path for all repositories to fine .typelibs */
 PHP_METHOD(Repository, prependSearchPath)
 {
 	char *path;
 	int  path_len;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &path, &path_len)
-			== FAILURE)
-	{
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &path, &path_len)) {
 		return;
 	}
+	PHP_GI_RESTORE_ERRORS
 
 	g_irepository_prepend_search_path(path);
 }
+/* }}} */
 
+/* {{{ proto array Repository::getSearchPath()
+                  adds a search path for all repositories to fine .typelibs */
 PHP_METHOD(Repository, getSearchPath)
 {
 	gpointer data;
 	GSList   *list;
 	guint    len, i;
 
-	if (zend_parse_parameters_none() == FAILURE)
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
 		return;
+	}
+	PHP_GI_RESTORE_ERRORS
 
 	list = g_irepository_get_search_path();
 	len  = g_slist_length(list);
@@ -119,6 +128,7 @@ PHP_METHOD(Repository, getSearchPath)
 		add_next_index_string(return_value, (char *) data, 1);
 	}
 }
+/* }}} */
 
 /* {{{ proto void G\Introspection\Repository->isRegistered(string $namespace[, string $version])
                   Allows you to check if a namespace has been registered, and optionally a specific
@@ -140,34 +150,6 @@ PHP_METHOD(Repository, isRegistered)
 	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_BOOL(g_irepository_is_registered(repository_object->repo, name, version));
-}
-/* }}} */
-
-/* {{{ proto void G\Introspection\Repository->getCPrefix(string $namespace)
-                  Gets the C namespace of a loaded repository */
-PHP_METHOD(Repository, getCPrefix)
-{
-
-	gi_repository_object *repository_object;
-	gchar *name;
-	int name_len;
-
-	PHP_GI_EXCEPTIONS
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
-		return;
-	}
-	PHP_GI_RESTORE_ERRORS
-
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
-
-	/* This will bomb and segfault!! if we don't check to make sure the typelib is loaded */
-	if (FALSE == g_irepository_is_registered(repository_object->repo, name, NULL)) {
-		zend_throw_exception_ex(spl_ce_InvalidArgumentException, 0 TSRMLS_CC,
-								"Namespace %s is not currently loaded", name);
-		return;
-	}
-
-	RETURN_STRING(g_irepository_get_c_prefix(repository_object->repo, name), 1);
 }
 /* }}} */
 
@@ -206,6 +188,34 @@ PHP_METHOD(Repository, require)
 	if(!typelib_object->typelib) {
 		RETURN_FALSE;
 	}
+}
+/* }}} */
+
+/* {{{ proto void G\Introspection\Repository->getCPrefix(string $namespace)
+                  Gets the C namespace of a loaded repository */
+PHP_METHOD(Repository, getCPrefix)
+{
+
+	gi_repository_object *repository_object;
+	gchar *name;
+	int name_len;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	/* This will bomb and segfault!! if we don't check to make sure the typelib is loaded */
+	if (FALSE == g_irepository_is_registered(repository_object->repo, name, NULL)) {
+		zend_throw_exception_ex(spl_ce_InvalidArgumentException, 0 TSRMLS_CC,
+								"Namespace %s is not currently loaded", name);
+		return;
+	}
+
+	RETURN_STRING(g_irepository_get_c_prefix(repository_object->repo, name), 1);
 }
 /* }}} */
 
