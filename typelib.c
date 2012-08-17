@@ -19,11 +19,41 @@
 #include "php_gi.h"
 
 zend_class_entry *ce_gi_typelib;
-static zend_object_handlers gi_typelib_object_handlers;
 
 /* ----------------------------------------------------------------
     G\Introspection\Typelib class API
 ------------------------------------------------------------------*/
+
+/* {{{ proto void Typelib->__construct()
+                 Private constructor placeholder (does nothing) */
+PHP_METHOD(Typelib, __construct)
+{
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+}
+/* }}} */
+
+/* {{{ proto string G\Introspection\Typelib->getNamespace()
+                  Gets the namespace of a typelib */
+PHP_METHOD(Typelib, getNamespace)
+{
+
+	gi_typelib_object *typelib_object;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	typelib_object = (gi_typelib_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	RETURN_STRING(g_typelib_get_namespace(typelib_object->typelib), 1);
+}
+/* }}} */
 
 /* ----------------------------------------------------------------
     G\Introspection\Typelib Object management
@@ -59,7 +89,7 @@ static zend_object_value gi_typelib_object_create(zend_class_entry *ce TSRMLS_DC
 		(zend_objects_store_dtor_t) zend_objects_destroy_object,
 		(zend_objects_free_object_storage_t) gi_typelib_object_free,
 		NULL TSRMLS_CC);
-	retval.handlers = &gi_typelib_object_handlers;
+	retval.handlers = &std_object_handlers;
 	return retval;
 }
 /* }}} */
@@ -70,6 +100,8 @@ static zend_object_value gi_typelib_object_create(zend_class_entry *ce TSRMLS_DC
 
 /* {{{ class methods */
 static const zend_function_entry gi_typelib_methods[] = {
+	PHP_ME(Typelib, __construct, NULL, ZEND_ACC_PRIVATE|ZEND_ACC_CTOR)
+	PHP_ME(Typelib, getNamespace, NULL, ZEND_ACC_PUBLIC)
 	ZEND_FE_END
 };
 /* }}} */
@@ -80,9 +112,9 @@ PHP_MINIT_FUNCTION(Typelib)
 	zend_class_entry ce;
 	INIT_NS_CLASS_ENTRY(ce, GI_NAMESPACE, "Typelib", gi_typelib_methods);
 	ce_gi_typelib = zend_register_internal_class(&ce TSRMLS_CC);
+	ce_gi_typelib->ce_flags |= ZEND_ACC_FINAL;
 
 	ce_gi_typelib->create_object = gi_typelib_object_create;
-	memcpy(&gi_typelib_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 
 	return SUCCESS;
 }

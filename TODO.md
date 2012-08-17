@@ -1,9 +1,24 @@
 TODO
 ===
 
- 1. repository.c - Typelib loading - can't really do this until I can create typelibs
- 1. repository.c - get_option_group - not sure how I'm going to handle this, should REALLY be in the glib extension
-                   perhaps after I get this extension and the gig generator done, g/ should die in favor of the
-                   glib extension (as G/ namespace) - will think on this  If I do this means you have to use
-                   the static glib....the other option is to move the group option stuff into G (with
-                   perhaps leaving the rest out?)
+ 1. repository.c - g_irepository_load_typelib - can't really do this until I can create typelibs
+ 1. repository.c - g_irepository_get_option_group - can't do this until the glib/gobject deps are done
+ 1. repository.c - GIRepositoryError - need enums for this
+ 1. repository.c - GIRepositoryLoadFlags - need enums for this, will also need to add flags option to
+                   require, requirePrivate, and loadTypelib (when it's done)
+ 1. repository.c - g_irepository_find_by_gtype  - need gtype stuff from glib
+
+ 1. typelib.c - g_typelib_new_from_memory - need glib
+ 1. typelib.c - g_typelib_new_from_const_memory - need glib
+ 1. typelib.c - g_typelib_new_from_mapped_file - need glib and gio
+ 1. typelib.c - g_typelib_symbol - need glib
+
+Currently we have a chicken and egg issue going on with the extension here - it is going to need to dep
+on both glib (for basic types wrappers) and gobject (for object stuff) extensions at some point when we're
+ready to do the importing.  For now the focus is on getting all the introspection stuff working so the
+generator can be created. After the generator works the dep tree will be glib <- gobject <- gintrospection.
+Yes that means some importing and renaming and moving GError stuff to use glib stuff (which will be namespace G)
+
+IGNORED:
+G_IREPOSITORY_ERROR (g_irepository_error_quark()) - managed by GError stuff
+g_typelib_free - managed by object destruction
