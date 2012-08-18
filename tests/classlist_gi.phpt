@@ -11,7 +11,7 @@ var_dump($ext->getClassNames());
 ?>
 = DONE =
 --EXPECT--
-array(18) {
+array(22) {
   [0]=>
   string(26) "G\Introspection\Repository"
   [1]=>
@@ -48,5 +48,13 @@ array(18) {
   string(28) "G\Introspection\PropertyInfo"
   [17]=>
   string(24) "G\Introspection\TypeInfo"
+  [18]=>
+  string(32) "G\Introspection\Repository\Error"
+  [19]=>
+  string(36) "G\Introspection\Repository\LoadFlags"
+  [20]=>
+  string(24) "G\Introspection\InfoType"
+  [21]=>
+  string(31) "G\Introspection\VFuncInfo\Flags"
 }
 = DONE =

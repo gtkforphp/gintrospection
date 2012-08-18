@@ -78,6 +78,14 @@ zend_class_entry* php_gi_get_info_ce(GIBaseInfo *info)
     G\Introspection\BaseInfo class API
 ------------------------------------------------------------------*/
 
+ZEND_BEGIN_ARG_INFO(BaseInfo_getAttribute_args, ZEND_SEND_BY_VAL)
+	ZEND_ARG_INFO(0, name)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO(BaseInfo_equal_args, ZEND_SEND_BY_VAL)
+	ZEND_ARG_OBJ_INFO(0, info, G\\Introspection\\BaseInfo, ZEND_SEND_BY_VAL)
+ZEND_END_ARG_INFO()
+
 /* {{{ proto void BaseInfo->__construct()
                  Private constructor placeholder (does nothing) */
 PHP_METHOD(BaseInfo, __construct)
@@ -87,6 +95,30 @@ PHP_METHOD(BaseInfo, __construct)
 		return;
 	}
 	PHP_GI_RESTORE_ERRORS
+}
+/* }}} */
+
+/* {{{ proto string G\Introspection\BaseInfo->getType()
+                  get enum of type */
+PHP_METHOD(BaseInfo, getType)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+	GIInfoType type;
+	const gchar *name;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	type = g_base_info_get_type(baseinfo_object->info);
+
+	object_init_ex(return_value, ce_gi_infotype);
+	php_g_set_enum_value(&return_value, type TSRMLS_CC);
 }
 /* }}} */
 
@@ -171,6 +203,33 @@ PHP_METHOD(BaseInfo, isDeprecated)
 }
 /* }}} */
 
+/* {{{ proto string G\Introspection\BaseInfo->getAttribute(string $name)
+                  get a value for a single attribute */
+PHP_METHOD(BaseInfo, getAttribute)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+	gchar *name;
+	int name_len;
+	const gchar *value;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	value = g_base_info_get_attribute(baseinfo_object->info, name);
+
+	if(value) {
+		RETURN_STRING(value, 1);
+	}
+
+}
+/* }}} */
+
 /* {{{ proto array G\Introspection\BaseInfo->getAttributes()
                   list of attributes */
 PHP_METHOD(BaseInfo, getAttributes)
@@ -190,10 +249,88 @@ PHP_METHOD(BaseInfo, getAttributes)
 
 	array_init(return_value);
 	while (g_base_info_iterate_attributes (baseinfo_object->info, &iter, &name, &value)) {
-		php_printf("attribute name: %s value: %s", name, value);
 		add_assoc_string(return_value, name, value, 1);
 	}
 
+}
+/* }}} */
+
+/* {{{ proto object G\Introspection\BaseInfo->getContainer()
+                  gets the container info (or null) for an item */
+PHP_METHOD(BaseInfo, getContainer)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+	GIBaseInfo *info;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	info = g_base_info_get_container(baseinfo_object->info);
+
+	if (NULL == info) {
+		RETURN_NULL();
+	}
+
+	object_init_ex(return_value, php_gi_get_info_ce(info));
+	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	baseinfo_object->is_constructed = TRUE;
+	baseinfo_object->info = g_base_info_ref(info);
+	g_base_info_unref(info);
+}
+/* }}} */
+
+/* {{{ proto object G\Introspection\BaseInfo->getTypelib()
+                  gets the typelib for a baseinfo */
+PHP_METHOD(BaseInfo, getTypelib)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+	gi_typelib_object *typelib_object;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	object_init_ex(return_value, ce_gi_typelib);
+	typelib_object = (gi_typelib_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	typelib_object->is_constructed = TRUE;
+
+	typelib_object->typelib = g_base_info_get_typelib(baseinfo_object->info);
+	if(!typelib_object->typelib) {
+		RETURN_FALSE;
+	}
+}
+/* }}} */
+
+/* {{{ proto boolean G\Introspection\BaseInfo->equal(BaseInfo $object)
+                  get a value for a single attribute */
+PHP_METHOD(BaseInfo, equal)
+{
+
+	gi_baseinfo_object *baseinfo_object1;
+	gi_baseinfo_object *baseinfo_object2;
+	zval *object;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &object, ce_gi_baseinfo)) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object1 = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object2 = (gi_baseinfo_object *) zend_object_store_get_object(object TSRMLS_CC);
+
+	RETURN_BOOL(g_base_info_equal(baseinfo_object1->info, baseinfo_object2->info));
 }
 /* }}} */
 
@@ -246,12 +383,16 @@ static zend_object_value gi_baseinfo_object_create(zend_class_entry *ce TSRMLS_D
 /* {{{ baseinfo methods */
 static const zend_function_entry gi_baseinfo_methods[] = {
 	PHP_ME(BaseInfo, __construct, NULL, ZEND_ACC_PRIVATE|ZEND_ACC_CTOR)
+	PHP_ME(BaseInfo, getType, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(BaseInfo, getTypeName, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(BaseInfo, getName, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(BaseInfo, getNameSpace, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(BaseInfo, isDeprecated, NULL, ZEND_ACC_PUBLIC)
-
+	PHP_ME(BaseInfo, getAttribute, BaseInfo_getAttribute_args, ZEND_ACC_PUBLIC)
 	PHP_ME(BaseInfo, getAttributes, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(BaseInfo, getContainer, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(BaseInfo, getTypelib, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(BaseInfo, equal, BaseInfo_equal_args, ZEND_ACC_PUBLIC)
 	ZEND_FE_END
 };
 /* }}} */

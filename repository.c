@@ -33,7 +33,7 @@ struct _gi_repository_object {
     G\Introspection\Repository class API
 ------------------------------------------------------------------*/
 
-ZEND_BEGIN_ARG_INFO_EX(Repository_prependSearchPath_args, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
+ZEND_BEGIN_ARG_INFO(Repository_prependSearchPath_args, ZEND_SEND_BY_VAL)
 	ZEND_ARG_INFO(0, namespace)
 ZEND_END_ARG_INFO()
 

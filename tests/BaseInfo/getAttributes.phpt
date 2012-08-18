@@ -13,14 +13,12 @@ $repo = Gir::getDefault();
 // load the repo - we'll do GLib since it SHOULD be around
 $repo->require('GLib');
 
-$list = $repo->getInfos('GLib');
-foreach($list as $info) {
-     $attr = $info->getAttributes();
-     var_dump($attr);
-}
-// get the Timer baseinfo
+// no attributes
 $baseinfo = $repo->findByName('GLib', 'Timer');
+var_dump($baseinfo->getAttributes());
 
+// TODO: find one with real attributes to test!
+$baseinfo = $repo->findByName('GLib', 'Timer');
 var_dump($baseinfo->getAttributes());
 
 // too many args
@@ -32,7 +30,14 @@ try {
 ?>
 = DONE =
 --EXPECT--
-bool(false)
-bool(true)
-G\Introspection\BaseInfo::isDeprecated() expects exactly 0 parameters, 1 given
+array(0) {
+}
+
+array(1) {
+  ["realattribute"]=>
+  string(13) "someattribute"
+}
+G\Introspection\BaseInfo::getAttributes() expects exactly 0 parameters, 1 given
 = DONE =
+--XFAIL--
+Need to find an info in a typelib with attributes to actually test this

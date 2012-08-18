@@ -21,6 +21,7 @@
 
 zend_class_entry *ce_gi_repositoryerror;
 zend_class_entry *ce_gi_repositoryloadflags;
+zend_class_entry *ce_gi_infotype;
 
 zend_class_entry *ce_gi_vfuncinfoflags;
 
@@ -30,7 +31,7 @@ zend_class_entry *ce_gi_vfuncinfoflags;
 
 PHP_MINIT_FUNCTION(gi_Enums)
 {
-	zend_class_entry error_ce, lazy_ce;
+	zend_class_entry error_ce, lazy_ce, info_ce;
 	zend_class_entry flags_ce;
 
 	INIT_NS_CLASS_ENTRY(error_ce, ZEND_NS_NAME(GI_NAMESPACE, "Repository"), "Error", NULL);
@@ -45,6 +46,29 @@ PHP_MINIT_FUNCTION(gi_Enums)
 	ce_gi_repositoryloadflags = zend_register_internal_class_ex(&lazy_ce, ce_g_enum, NULL TSRMLS_CC);
 
 	REGISTER_ENUM_CONST("LAZY", G_IREPOSITORY_LOAD_FLAG_LAZY, ce_gi_repositoryloadflags);
+
+	INIT_NS_CLASS_ENTRY(info_ce, GI_NAMESPACE, "InfoType", NULL);
+	ce_gi_infotype = zend_register_internal_class_ex(&info_ce, ce_g_enum, NULL TSRMLS_CC);
+
+	REGISTER_ENUM_CONST("INVALID", GI_INFO_TYPE_INVALID, ce_gi_infotype);
+	REGISTER_ENUM_CONST("FUNCTION", GI_INFO_TYPE_FUNCTION, ce_gi_infotype);
+	REGISTER_ENUM_CONST("CALLBACK", GI_INFO_TYPE_CALLBACK, ce_gi_infotype);
+	REGISTER_ENUM_CONST("STRUCT", GI_INFO_TYPE_STRUCT, ce_gi_infotype);
+	REGISTER_ENUM_CONST("BOXED", GI_INFO_TYPE_BOXED, ce_gi_infotype);
+	REGISTER_ENUM_CONST("ENUM", GI_INFO_TYPE_ENUM, ce_gi_infotype);
+	REGISTER_ENUM_CONST("FLAGS", GI_INFO_TYPE_FLAGS, ce_gi_infotype);
+	REGISTER_ENUM_CONST("OBJECT", GI_INFO_TYPE_OBJECT, ce_gi_infotype);
+	REGISTER_ENUM_CONST("INTERFACE", GI_INFO_TYPE_INTERFACE, ce_gi_infotype);
+	REGISTER_ENUM_CONST("UNION", GI_INFO_TYPE_UNION, ce_gi_infotype);
+	REGISTER_ENUM_CONST("VALUE", GI_INFO_TYPE_VALUE, ce_gi_infotype);
+	REGISTER_ENUM_CONST("SIGNAL", GI_INFO_TYPE_SIGNAL, ce_gi_infotype);
+	REGISTER_ENUM_CONST("VFUNC", GI_INFO_TYPE_VFUNC, ce_gi_infotype);
+	REGISTER_ENUM_CONST("CONSTANT", GI_INFO_TYPE_CONSTANT, ce_gi_infotype);
+	REGISTER_ENUM_CONST("PROPERTY", GI_INFO_TYPE_PROPERTY, ce_gi_infotype);
+	REGISTER_ENUM_CONST("FIELD", GI_INFO_TYPE_FIELD, ce_gi_infotype);
+	REGISTER_ENUM_CONST("ARG", GI_INFO_TYPE_ARG, ce_gi_infotype);
+	REGISTER_ENUM_CONST("TYPE", GI_INFO_TYPE_TYPE, ce_gi_infotype);
+	REGISTER_ENUM_CONST("UNRESOLVED", GI_INFO_TYPE_UNRESOLVED, ce_gi_infotype);
 
 	INIT_NS_CLASS_ENTRY(flags_ce, ZEND_NS_NAME(GI_NAMESPACE, "VFuncInfo"), "Flags", NULL);
 	ce_gi_vfuncinfoflags = zend_register_internal_class_ex(&flags_ce, ce_g_enum, NULL TSRMLS_CC);
