@@ -31,14 +31,14 @@
 /* typelib info */
 struct _gi_typelib_object {
 	zend_object std;
-	zend_bool is_constructed;
-	GITypelib* typelib;
+	zend_bool   is_constructed;
+	GITypelib  *typelib;
 };
 
 /* baseinfo object */
 struct _gi_baseinfo_object {
 	zend_object std;
-	zend_bool is_constructed;
+	zend_bool   is_constructed;
 	GIBaseInfo *info;
 };
 
@@ -48,6 +48,13 @@ struct _gi_baseinfo_object {
 
 #define PHP_GI_RESTORE_ERRORS \
 	zend_restore_error_handling(&error_handling TSRMLS_CC);
+
+#define MACROSTR(k) #k
+
+#define REGISTER_ENUM_CONST(const_name, value, ce) \
+	zend_declare_class_constant_long(ce, const_name, sizeof(const_name)-1, (long)value TSRMLS_CC);
+
+extern zend_class_entry* php_gi_get_info_ce(GIBaseInfo *info);
 
 extern zend_module_entry gi_module_entry;
 #define phpext_gi_ptr &gi_module_entry

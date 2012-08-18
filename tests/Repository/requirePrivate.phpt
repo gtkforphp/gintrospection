@@ -7,6 +7,7 @@ if(!extension_loaded('gi')) die('skip - GI extension not available');
 --FILE--
 <?php
 use G\Introspection\Repository as Gir;
+use G\Introspection\Repository\LoadFlags as LF;
 use G\Introspection\Typelib;
 use G\Exception as Ge;
 
@@ -38,9 +39,12 @@ try {
 // load glib to get a good path
 $repo->require('GLib');
 $path = dirname($repo->getTypelibPath('GLib'));
+
+// load gobject simply
 var_dump($repo->requirePrivate($path, 'GObject') instanceof Typelib);
 
-// should test loading it right with version, but don't have a typelib to rely on for that
+// load it with version and flags
+var_dump($repo->requirePrivate($path, 'Gio', '2.0', new LF(LF::LAZY)) instanceof Typelib);
 
 // too few args
 try {
@@ -58,7 +62,7 @@ try {
 
 // too many args
 try {
-     $repo->requirePrivate(1, 1, 1, 1);
+     $repo->requirePrivate(1, 1, 1, new LF(LF::LAZY), 1);
 } catch (InvalidArgumentException $e) {
     echo $e->getMessage(), PHP_EOL;
 }
@@ -83,6 +87,13 @@ try {
 } catch (InvalidArgumentException $e) {
     echo $e->getMessage(), PHP_EOL;
 }
+
+// enum instance only
+try {
+     $repo->requirePrivate(1, 1, 1, 1);
+} catch (InvalidArgumentException $e) {
+    echo $e->getMessage(), PHP_EOL;
+}
 ?>
 = DONE =
 --EXPECT--
@@ -90,10 +101,12 @@ g-irepository-error-quark:Typelib file for namespace 'foobar' (any version) not 
 g-irepository-error-quark:Typelib file for namespace 'GLib', version '0.1.0' not found
 g-irepository-error-quark:Typelib file for namespace 'GLib', version '2.0' not found
 bool(true)
+bool(true)
 G\Introspection\Repository::requirePrivate() expects at least 2 parameters, 0 given
 G\Introspection\Repository::requirePrivate() expects at least 2 parameters, 1 given
-G\Introspection\Repository::requirePrivate() expects at most 3 parameters, 4 given
+G\Introspection\Repository::requirePrivate() expects at most 4 parameters, 5 given
 G\Introspection\Repository::requirePrivate() expects parameter 1 to be string, array given
 G\Introspection\Repository::requirePrivate() expects parameter 2 to be string, array given
 G\Introspection\Repository::requirePrivate() expects parameter 3 to be string, array given
+Argument 4 passed to G\Introspection\Repository::requirePrivate() must be an instance of G\Introspection\Repository\LoadFlags, integer given
 = DONE =

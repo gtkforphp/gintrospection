@@ -21,9 +21,10 @@ try {
 // load the repo - we'll do GLib since it SHOULD be around
 $repo->require('GLib');
 
-$baseinfo = $repo->findByName('GLib', 'DestroyNotify');
+$baseinfo = $repo->findByName('GLib', 'Timer');
 
 var_dump($baseinfo instanceof BaseInfo);
+var_dump(get_class($baseinfo));
 
 $baseinfo = $repo->findByName('GLib', 'foobar');
 
@@ -68,6 +69,7 @@ try {
 --EXPECT--
 Namespace nothing is not currently loaded
 bool(true)
+string(26) "G\Introspection\StructInfo"
 NULL
 G\Introspection\Repository::findByName() expects exactly 2 parameters, 0 given
 G\Introspection\Repository::findByName() expects exactly 2 parameters, 1 given

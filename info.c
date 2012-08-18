@@ -1,0 +1,352 @@
+/*
+  +----------------------------------------------------------------------+
+  | PHP Version 5                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2012 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: Elizabeth M Smith <auroraeosrose@php.net>                    |
+  +----------------------------------------------------------------------+
+*/
+
+#include "php_gi.h"
+
+zend_class_entry *ce_gi_vfuncinfo;
+zend_class_entry *ce_gi_signalinfo;
+zend_class_entry *ce_gi_functioninfo;
+zend_class_entry *ce_gi_callableinfo;
+zend_class_entry *ce_gi_unioninfo;
+zend_class_entry *ce_gi_structinfo;
+zend_class_entry *ce_gi_objectinfo;
+zend_class_entry *ce_gi_interfaceinfo;
+zend_class_entry *ce_gi_enuminfo;
+zend_class_entry *ce_gi_regtypeinfo;
+zend_class_entry *ce_gi_arginfo;
+zend_class_entry *ce_gi_constantinfo;
+zend_class_entry *ce_gi_fieldinfo;
+zend_class_entry *ce_gi_propertyinfo;
+zend_class_entry *ce_gi_typeinfo;
+zend_class_entry *ce_gi_baseinfo;
+
+/* {{{ exported function to take a gerror, throw an exception, and clear the error */
+zend_class_entry* php_gi_get_info_ce(GIBaseInfo *info)
+{
+	if(GI_IS_VFUNC_INFO(info)) {
+		return ce_gi_vfuncinfo;
+	} else if (GI_IS_SIGNAL_INFO(info)) {
+		return ce_gi_signalinfo;
+	} else if (GI_IS_FUNCTION_INFO(info)) {
+		return ce_gi_functioninfo;
+	} else if (GI_IS_CALLABLE_INFO(info)) {
+		return ce_gi_callableinfo;
+	} else if (GI_IS_UNION_INFO(info)) {
+		return ce_gi_unioninfo;
+	} else if (GI_IS_STRUCT_INFO(info)) {
+		return ce_gi_structinfo;
+	} else if (GI_IS_OBJECT_INFO(info)) {
+		return ce_gi_objectinfo;
+	} else if (GI_IS_INTERFACE_INFO(info)) {
+		return ce_gi_interfaceinfo;
+	} else if (GI_IS_ENUM_INFO(info)) {
+		return ce_gi_enuminfo;
+	} else if (GI_IS_REGISTERED_TYPE_INFO(info)) {
+		return ce_gi_regtypeinfo;
+	} else if (GI_IS_ARG_INFO(info)) {
+		return ce_gi_arginfo;
+	} else if (GI_IS_CONSTANT_INFO(info)) {
+		return ce_gi_constantinfo;
+	} else if (GI_IS_FIELD_INFO(info)) {
+		return ce_gi_fieldinfo;
+	} else if (GI_IS_PROPERTY_INFO(info)) {
+		return ce_gi_propertyinfo;
+	} else if ( GI_IS_TYPE_INFO(info)) {
+		return ce_gi_typeinfo;
+	}
+
+	return ce_gi_baseinfo;
+}
+/* }}} */
+
+/* ----------------------------------------------------------------
+    G\Introspection\BaseInfo class API
+------------------------------------------------------------------*/
+
+/* {{{ proto void BaseInfo->__construct()
+                 Private constructor placeholder (does nothing) */
+PHP_METHOD(BaseInfo, __construct)
+{
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+}
+/* }}} */
+
+/* {{{ proto string G\Introspection\BaseInfo->getTypeName()
+                  string name of the baseinfo type */
+PHP_METHOD(BaseInfo, getTypeName)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+	GIInfoType type;
+	const gchar *name;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	type = g_base_info_get_type(baseinfo_object->info);
+	name = g_info_type_to_string(type);
+
+	RETURN_STRING(name, 1);
+}
+/* }}} */
+
+/* {{{ proto string G\Introspection\BaseInfo->getName()
+                  get the name of the information */
+PHP_METHOD(BaseInfo, getName)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	RETURN_STRING(g_base_info_get_name(baseinfo_object->info), 1);
+}
+/* }}} */
+
+/* {{{ proto string G\Introspection\BaseInfo->getNameSpace()
+                  get the namespace of the information */
+PHP_METHOD(BaseInfo, getNameSpace)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	RETURN_STRING(g_base_info_get_namespace(baseinfo_object->info), 1);
+}
+/* }}} */
+
+/* {{{ proto bool G\Introspection\BaseInfo->getDeprecated()
+                  is it deprecated */
+PHP_METHOD(BaseInfo, isDeprecated)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	RETURN_BOOL(g_base_info_is_deprecated(baseinfo_object->info));
+}
+/* }}} */
+
+/* {{{ proto array G\Introspection\BaseInfo->getAttributes()
+                  list of attributes */
+PHP_METHOD(BaseInfo, getAttributes)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+	GIAttributeIter iter = { 0, };
+	gchar *name, *value;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	array_init(return_value);
+	while (g_base_info_iterate_attributes (baseinfo_object->info, &iter, &name, &value)) {
+		php_printf("attribute name: %s value: %s", name, value);
+		add_assoc_string(return_value, name, value, 1);
+	}
+
+}
+/* }}} */
+
+/* ----------------------------------------------------------------
+    G\Introspection\BaseInfo Object management
+------------------------------------------------------------------*/
+
+/* {{{ gi_baseinfo_object_free */
+static void gi_baseinfo_object_free(void *object TSRMLS_DC)
+{
+	gi_baseinfo_object *baseinfo_object = (gi_baseinfo_object *)object;
+
+	zend_object_std_dtor(&baseinfo_object->std TSRMLS_CC);
+	baseinfo_object->is_constructed = FALSE;
+	if (NULL != baseinfo_object->info) {
+		g_base_info_unref(baseinfo_object->info);
+		baseinfo_object->info = NULL;
+	}
+
+	efree(baseinfo_object);
+}
+/* }}} */
+
+/* {{{ gi_baseinfo_object_create */
+static zend_object_value gi_baseinfo_object_create(zend_class_entry *ce TSRMLS_DC)
+{
+	zend_object_value retval;
+	gi_baseinfo_object *baseinfo_object;
+
+	baseinfo_object = ecalloc(1, sizeof(gi_baseinfo_object));
+	zend_object_std_init((zend_object *) baseinfo_object, ce TSRMLS_CC);
+	baseinfo_object->is_constructed = FALSE;
+	baseinfo_object->info = NULL;
+
+	object_properties_init(&baseinfo_object->std, ce);
+
+	retval.handle = zend_objects_store_put(baseinfo_object,
+		(zend_objects_store_dtor_t) zend_objects_destroy_object,
+		(zend_objects_free_object_storage_t) gi_baseinfo_object_free,
+		NULL TSRMLS_CC);
+	retval.handlers = &std_object_handlers;
+	return retval;
+}
+/* }}} */
+
+/* ----------------------------------------------------------------
+    G\Introspection\BaseInfo Definition and registration
+------------------------------------------------------------------*/
+
+/* {{{ baseinfo methods */
+static const zend_function_entry gi_baseinfo_methods[] = {
+	PHP_ME(BaseInfo, __construct, NULL, ZEND_ACC_PRIVATE|ZEND_ACC_CTOR)
+	PHP_ME(BaseInfo, getTypeName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(BaseInfo, getName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(BaseInfo, getNameSpace, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(BaseInfo, isDeprecated, NULL, ZEND_ACC_PUBLIC)
+
+	PHP_ME(BaseInfo, getAttributes, NULL, ZEND_ACC_PUBLIC)
+	ZEND_FE_END
+};
+/* }}} */
+
+/* {{{ class methods */
+static const zend_function_entry gi_vfuncinfo_methods[] = {
+	//PHP_ME(BaseInfo, getTypeName, NULL, ZEND_ACC_PUBLIC)
+	//PHP_ME(BaseInfo, getName, NULL, ZEND_ACC_PUBLIC)
+	//PHP_ME(VFuncInfo, getNameSpace, NULL, ZEND_ACC_PUBLIC)
+	//PHP_ME(VFuncInfo, getOffset, NULL, ZEND_ACC_PUBLIC)
+	//PHP_ME(VFuncInfo, getSignal, NULL, ZEND_ACC_PUBLIC)
+	//PHP_ME(VFuncInfo, getInvoker, NULL, ZEND_ACC_PUBLIC)
+	ZEND_FE_END
+};
+/* }}} */
+
+/* {{{ PHP_MINIT_FUNCTION */
+PHP_MINIT_FUNCTION(gi_Info)
+{
+	zend_class_entry base_ce, callable_ce, function_ce, signal_ce, vfunc_ce, regtype_ce, enum_ce, property_ce;
+	zend_class_entry union_ce, struct_ce, object_ce, interface_ce, arginfo_ce, constant_ce, field_ce, type_ce;
+
+	INIT_NS_CLASS_ENTRY(base_ce, GI_NAMESPACE, "BaseInfo", gi_baseinfo_methods);
+	ce_gi_baseinfo = zend_register_internal_class(&base_ce TSRMLS_CC);
+	ce_gi_baseinfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(callable_ce, GI_NAMESPACE, "CallableInfo", NULL);
+	ce_gi_callableinfo = zend_register_internal_class_ex(&callable_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
+	ce_gi_callableinfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(function_ce, GI_NAMESPACE, "FunctionInfo", NULL);
+	ce_gi_functioninfo = zend_register_internal_class_ex(&function_ce, ce_gi_callableinfo, NULL TSRMLS_CC);
+	ce_gi_functioninfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(signal_ce, GI_NAMESPACE, "SignalInfo", NULL);
+	ce_gi_signalinfo = zend_register_internal_class_ex(&signal_ce, ce_gi_callableinfo, NULL TSRMLS_CC);
+	ce_gi_signalinfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(vfunc_ce, GI_NAMESPACE, "VFuncInfo", NULL);
+	ce_gi_vfuncinfo = zend_register_internal_class_ex(&vfunc_ce, ce_gi_callableinfo, NULL TSRMLS_CC);
+	ce_gi_vfuncinfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(regtype_ce, GI_NAMESPACE, "RegTypeInfo", NULL);
+	ce_gi_regtypeinfo = zend_register_internal_class_ex(&regtype_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
+	ce_gi_regtypeinfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(enum_ce, GI_NAMESPACE, "EnumInfo", NULL);
+	ce_gi_enuminfo = zend_register_internal_class_ex(&enum_ce, ce_gi_regtypeinfo, NULL TSRMLS_CC);
+	ce_gi_enuminfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(union_ce, GI_NAMESPACE, "UnionInfo", NULL);
+	ce_gi_unioninfo = zend_register_internal_class_ex(&union_ce, ce_gi_regtypeinfo, NULL TSRMLS_CC);
+	ce_gi_unioninfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(struct_ce, GI_NAMESPACE, "StructInfo", NULL);
+	ce_gi_structinfo = zend_register_internal_class_ex(&struct_ce, ce_gi_regtypeinfo, NULL TSRMLS_CC);
+	ce_gi_structinfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(object_ce, GI_NAMESPACE, "ObjectInfo", NULL);
+	ce_gi_objectinfo = zend_register_internal_class_ex(&object_ce, ce_gi_regtypeinfo, NULL TSRMLS_CC);
+	ce_gi_objectinfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(interface_ce, GI_NAMESPACE, "InterfaceInfo", NULL);
+	ce_gi_interfaceinfo = zend_register_internal_class_ex(&interface_ce, ce_gi_regtypeinfo, NULL TSRMLS_CC);
+	ce_gi_interfaceinfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(arginfo_ce, GI_NAMESPACE, "ArgInfo", NULL);
+	ce_gi_arginfo = zend_register_internal_class_ex(&arginfo_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
+	ce_gi_arginfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(constant_ce, GI_NAMESPACE, "ConstantInfo", NULL);
+	ce_gi_constantinfo = zend_register_internal_class_ex(&constant_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
+	ce_gi_constantinfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(field_ce, GI_NAMESPACE, "FieldInfo", NULL);
+	ce_gi_fieldinfo = zend_register_internal_class_ex(&field_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
+	ce_gi_fieldinfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(property_ce, GI_NAMESPACE, "PropertyInfo", NULL);
+	ce_gi_propertyinfo = zend_register_internal_class_ex(&property_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
+	ce_gi_propertyinfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(type_ce, GI_NAMESPACE, "TypeInfo", NULL);
+	ce_gi_typeinfo = zend_register_internal_class_ex(&type_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
+	ce_gi_typeinfo->create_object = gi_baseinfo_object_create;
+
+	return SUCCESS;
+}
+/* }}} */
+
+/*
+ * Local variables:
+ * tab-width: 4
+ * c-basic-offset: 4
+ * End:
+ * vim600: noet sw=4 ts=4 fdm=marker
+ * vim<600: noet sw=4 ts=4
+ */

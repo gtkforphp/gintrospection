@@ -107,7 +107,7 @@ static const zend_function_entry gi_typelib_methods[] = {
 /* }}} */
 
 /* {{{ PHP_MINIT_FUNCTION */
-PHP_MINIT_FUNCTION(Typelib)
+PHP_MINIT_FUNCTION(gi_Typelib)
 {
 	zend_class_entry ce;
 	INIT_NS_CLASS_ENTRY(ce, GI_NAMESPACE, "Typelib", gi_typelib_methods);

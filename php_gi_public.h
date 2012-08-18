@@ -50,9 +50,27 @@ typedef struct _gi_repository_object gi_repository_object;
 typedef struct _gi_baseinfo_object gi_baseinfo_object;
 typedef struct _gi_typelib_object gi_typelib_object;
 
-extern PHP_GI_API zend_class_entry *ce_gi_repository;
-extern PHP_GI_API zend_class_entry *ce_gi_typelib;
-extern PHP_GI_API zend_class_entry *ce_gi_baseinfo;
+extern zend_class_entry *ce_gi_repository;
+extern zend_class_entry *ce_gi_typelib;
+
+extern zend_class_entry *ce_gi_vfuncinfo;
+extern zend_class_entry *ce_gi_signalinfo;
+extern zend_class_entry *ce_gi_functioninfo;
+extern zend_class_entry *ce_gi_callableinfo;
+extern zend_class_entry *ce_gi_unioninfo;
+extern zend_class_entry *ce_gi_structinfo;
+extern zend_class_entry *ce_gi_objectinfo;
+extern zend_class_entry *ce_gi_interfaceinfo;
+extern zend_class_entry *ce_gi_enuminfo;
+extern zend_class_entry *ce_gi_regtypeinfo;
+extern zend_class_entry *ce_gi_arginfo;
+extern zend_class_entry *ce_gi_constantinfo;
+extern zend_class_entry *ce_gi_fieldinfo;
+extern zend_class_entry *ce_gi_propertyinfo;
+extern zend_class_entry *ce_gi_typeinfo;
+extern zend_class_entry *ce_gi_baseinfo;
+
+extern *ce_gi_repositoryloadflags;
 
 #endif /* PHP_GI_PUBLIC_EXT_H */
 

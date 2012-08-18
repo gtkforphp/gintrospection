@@ -20,7 +20,7 @@ if test "$PHP_GI" != "no"; then
 	PHP_SUBST(GI_SHARED_LIBADD)
 	AC_DEFINE(HAVE_GI, 1, [ ])
 
-	PHP_NEW_EXTENSION(gi, gi.c repository.c typelib.c baseinfo.c, $ext_shared)
+	PHP_NEW_EXTENSION(gi, gi.c repository.c typelib.c enum.c info.c, $ext_shared)
 
 	EXT_GIR_HEADERS="php_gi_public.h"
 
