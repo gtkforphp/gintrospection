@@ -22,6 +22,7 @@
 zend_class_entry *ce_gi_repositoryerror;
 zend_class_entry *ce_gi_repositoryloadflags;
 zend_class_entry *ce_gi_infotype;
+zend_class_entry *ce_gi_typetag;
 
 zend_class_entry *ce_gi_vfuncinfoflags;
 
@@ -31,7 +32,7 @@ zend_class_entry *ce_gi_vfuncinfoflags;
 
 PHP_MINIT_FUNCTION(gi_Enums)
 {
-	zend_class_entry error_ce, lazy_ce, info_ce;
+	zend_class_entry error_ce, lazy_ce, info_ce, tags_ce;
 	zend_class_entry flags_ce;
 
 	INIT_NS_CLASS_ENTRY(error_ce, ZEND_NS_NAME(GI_NAMESPACE, "Repository"), "Error", NULL);
@@ -77,6 +78,32 @@ PHP_MINIT_FUNCTION(gi_Enums)
 	REGISTER_ENUM_CONST("MUST_OVERRIDE", GI_VFUNC_MUST_OVERRIDE, ce_gi_vfuncinfoflags);
 	REGISTER_ENUM_CONST("MUST_NOT_OVERRIDE", GI_VFUNC_MUST_NOT_OVERRIDE, ce_gi_vfuncinfoflags);
 	REGISTER_ENUM_CONST("THROWS", GI_VFUNC_THROWS, ce_gi_vfuncinfoflags);
+
+	INIT_NS_CLASS_ENTRY(tags_ce, ZEND_NS_NAME(GI_NAMESPACE, "TypeInfo"), "Tag", NULL);
+	ce_gi_typetag = zend_register_internal_class_ex(&tags_ce, ce_g_enum, NULL TSRMLS_CC);
+
+	REGISTER_ENUM_CONST("VOID", GI_TYPE_TAG_VOID, ce_gi_typetag);
+	REGISTER_ENUM_CONST("BOOLEAN", GI_TYPE_TAG_BOOLEAN, ce_gi_typetag);
+	REGISTER_ENUM_CONST("INT8", GI_TYPE_TAG_INT8, ce_gi_typetag);
+	REGISTER_ENUM_CONST("UINT8", GI_TYPE_TAG_UINT8, ce_gi_typetag);
+	REGISTER_ENUM_CONST("INT16", GI_TYPE_TAG_INT16, ce_gi_typetag);
+	REGISTER_ENUM_CONST("UINT16", GI_TYPE_TAG_UINT16, ce_gi_typetag);
+	REGISTER_ENUM_CONST("INT32", GI_TYPE_TAG_INT32, ce_gi_typetag);
+	REGISTER_ENUM_CONST("UINT32", GI_TYPE_TAG_UINT32, ce_gi_typetag);
+	REGISTER_ENUM_CONST("INT64", GI_TYPE_TAG_INT64, ce_gi_typetag);
+	REGISTER_ENUM_CONST("UINT64", GI_TYPE_TAG_UINT64, ce_gi_typetag);
+	REGISTER_ENUM_CONST("FLOAT", GI_TYPE_TAG_FLOAT, ce_gi_typetag);
+	REGISTER_ENUM_CONST("DOUBLE", GI_TYPE_TAG_DOUBLE, ce_gi_typetag);
+	REGISTER_ENUM_CONST("GTYPE", GI_TYPE_TAG_GTYPE, ce_gi_typetag);
+	REGISTER_ENUM_CONST("UTF8", GI_TYPE_TAG_UTF8, ce_gi_typetag);
+	REGISTER_ENUM_CONST("FILENAME", GI_TYPE_TAG_FILENAME, ce_gi_typetag);
+	REGISTER_ENUM_CONST("ARRAY", GI_TYPE_TAG_ARRAY, ce_gi_typetag);
+	REGISTER_ENUM_CONST("INTERFACE", GI_TYPE_TAG_INTERFACE, ce_gi_typetag);
+	REGISTER_ENUM_CONST("GLIST", GI_TYPE_TAG_GLIST, ce_gi_typetag);
+	REGISTER_ENUM_CONST("GSLIST", GI_TYPE_TAG_GSLIST, ce_gi_typetag);
+	REGISTER_ENUM_CONST("GHASH", GI_TYPE_TAG_GHASH, ce_gi_typetag);
+	REGISTER_ENUM_CONST("ERROR", GI_TYPE_TAG_ERROR, ce_gi_typetag);
+	REGISTER_ENUM_CONST("UNICHAR", GI_TYPE_TAG_UNICHAR, ce_gi_typetag);
 
 	return SUCCESS;
 }

@@ -72,6 +72,7 @@ extern zend_class_entry *ce_gi_baseinfo;
 
 extern zend_class_entry *ce_gi_repositoryloadflags;
 extern zend_class_entry *ce_gi_infotype;
+extern zend_class_entry *ce_gi_typetag;
 
 #endif /* PHP_GI_PUBLIC_EXT_H */
 

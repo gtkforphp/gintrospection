@@ -19,9 +19,6 @@ $baseinfo = $repo->findByName('GLib', 'Timer');
 // no attribute
 var_dump($baseinfo->getAttribute('fail'));
 
-// TODO: real attribute to load here
-echo $baseinfo->getAttribute('realattribute'), PHP_EOL;
-
 // too few args
 try {
      $baseinfo->getAttribute();
@@ -46,10 +43,7 @@ try {
 = DONE =
 --EXPECT--
 NULL
-someattribute
 G\Introspection\BaseInfo::getAttribute() expects exactly 1 parameter, 0 given
 G\Introspection\BaseInfo::getAttribute() expects exactly 1 parameter, 2 given
 G\Introspection\BaseInfo::getAttribute() expects parameter 1 to be string, array given
 = DONE =
---XFAIL--
-Need to find an info in a typelib with attributes to actually test this

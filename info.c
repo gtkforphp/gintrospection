@@ -34,6 +34,7 @@ zend_class_entry *ce_gi_fieldinfo;
 zend_class_entry *ce_gi_propertyinfo;
 zend_class_entry *ce_gi_typeinfo;
 zend_class_entry *ce_gi_baseinfo;
+zend_class_entry *ce_gi_valueinfo;
 
 /* {{{ exported function to take a gerror, throw an exception, and clear the error */
 zend_class_entry* php_gi_get_info_ce(GIBaseInfo *info)
@@ -335,6 +336,304 @@ PHP_METHOD(BaseInfo, equal)
 /* }}} */
 
 /* ----------------------------------------------------------------
+    G\Introspection\RegisteredTypeInfo class API
+------------------------------------------------------------------*/
+
+/* {{{ proto object G\Introspection\RegisteredTypeInfo->getGTypeName()
+                  Obtain the type name of the struct within the GObject type system */
+PHP_METHOD(RegisteredTypeInfo, getGTypeName)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+	const gchar * name;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	name = g_registered_type_info_get_type_name(baseinfo_object->info);
+
+	if (name) {
+		RETURN_STRING(name, 1);
+	}
+}
+/* }}} */
+
+/* {{{ proto object G\Introspection\RegisteredTypeInfo->getTypeInit()
+                  The type init function is the function which will register
+                  the GType within the GObject type system */
+PHP_METHOD(RegisteredTypeInfo, getTypeInit)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+	const gchar * name;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	name = g_registered_type_info_get_type_init(baseinfo_object->info);
+
+	if (name) {
+		RETURN_STRING(name, 1);
+	}
+}
+/* }}} */
+
+/* ----------------------------------------------------------------
+    G\Introspection\EnumInfo class API
+------------------------------------------------------------------*/
+
+ZEND_BEGIN_ARG_INFO(EnumInfo_getValue_args, ZEND_SEND_BY_VAL)
+	ZEND_ARG_INFO(0, index)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO(EnumInfo_getMethod_args, ZEND_SEND_BY_VAL)
+	ZEND_ARG_INFO(0, index)
+ZEND_END_ARG_INFO()
+
+/* {{{ proto int G\Introspection\EnumInfo->getNumValues()
+                  Gets the total number of values in the enum */
+PHP_METHOD(EnumInfo, getNumValues)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	RETURN_LONG(g_enum_info_get_n_values(baseinfo_object->info));
+}
+/* }}} */
+
+/* {{{ proto object G\Introspection\EnumInfo->getValue(string $namespace, int $index)
+                 Returns an info object at $index in the repository - index is 0 based
+                 so it is number of infos -1 for a range*/
+PHP_METHOD(EnumInfo, getValue)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+	long index;
+	gint total;
+	GIBaseInfo *info;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &index)) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	total = g_enum_info_get_n_values(baseinfo_object->info);
+
+	if (total == 0) {
+		RETURN_NULL();
+	}
+
+	/* our index must be between 0 and maximum number infos */
+	if (index < 0 || index > total) {
+		zend_throw_exception_ex(spl_ce_InvalidArgumentException, 0 TSRMLS_CC,
+								"Index must be between 0 and %d", total);
+		return;
+	}
+
+	info = g_enum_info_get_value(baseinfo_object->info, (gint) index);
+
+	if (NULL == info) {
+		RETURN_NULL();
+	}
+
+	object_init_ex(return_value, ce_gi_valueinfo);
+	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	baseinfo_object->is_constructed = TRUE;
+	baseinfo_object->info = g_base_info_ref(info);
+}
+/* }}} */
+
+/* {{{ proto array G\Introspection\EnumInfo->getValues()
+                 Returns an array of all enum value infos */
+PHP_METHOD(EnumInfo, getValues)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+	gint total, i;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	total = g_enum_info_get_n_values(baseinfo_object->info);
+
+	array_init(return_value);
+
+	for (i = 0; i < total; i++) {
+		gi_baseinfo_object *nested_object;
+		zval *zinfo;
+		GIBaseInfo *info = NULL;
+
+		info = g_enum_info_get_value(baseinfo_object->info, i);
+		/* baseinfo was not loaded right, continue */
+		if (NULL == info) {
+			continue;
+		} else {
+			MAKE_STD_ZVAL(zinfo);
+			object_init_ex(zinfo, ce_gi_valueinfo);
+			nested_object = (gi_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
+			nested_object->is_constructed = TRUE;
+			nested_object->info = g_base_info_ref(info);
+			add_next_index_zval(return_value, zinfo);
+		}
+	}
+}
+/* }}} */
+
+/* {{{ proto int G\Introspection\EnumInfo->getNumMethods()
+                  Gets the total number of methods in the enum */
+PHP_METHOD(EnumInfo, getNumMethods)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	RETURN_LONG(g_enum_info_get_n_methods(baseinfo_object->info));
+}
+/* }}} */
+
+/* {{{ proto object G\Introspection\EnumInfo->getMethod(string $namespace, int $index)
+                 Returns an info object at $index in the repository - index is 0 based
+                 so it is number of infos -1 for a range*/
+PHP_METHOD(EnumInfo, getMethod)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+	long index;
+	gint total;
+	GIBaseInfo *info = NULL;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &index)) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	total = g_enum_info_get_n_methods(baseinfo_object->info);
+
+	if (total == 0) {
+		RETURN_NULL();
+	}
+
+	/* our index must be between 0 and maximum number infos */
+	if (index < 0 || index > total) {
+		zend_throw_exception_ex(spl_ce_InvalidArgumentException, 0 TSRMLS_CC,
+								"Index must be between 0 and %d", total);
+		return;
+	}
+
+	info = g_enum_info_get_method(baseinfo_object->info, (gint) index);
+
+	if (NULL == info) {
+		RETURN_NULL();
+	}
+
+	object_init_ex(return_value, ce_gi_functioninfo);
+	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	baseinfo_object->is_constructed = TRUE;
+	baseinfo_object->info = g_base_info_ref(info);
+}
+/* }}} */
+
+/* {{{ proto array G\Introspection\EnumInfo->getMethods()
+                 Returns an array of all method infos */
+PHP_METHOD(EnumInfo, getMethods)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+	gint total, i;
+	GIBaseInfo *info;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	total = g_enum_info_get_n_methods(baseinfo_object->info);
+
+	array_init(return_value);
+
+	for (i = 0; i < total; i++) {
+		gi_baseinfo_object *baseinfo_object;
+		zval *zinfo;
+
+		info = g_enum_info_get_method(baseinfo_object->info, i);
+		/* baseinfo was not loaded right, continue */
+		if (NULL == info) {
+			continue;
+		} else {
+			MAKE_STD_ZVAL(zinfo);
+			object_init_ex(zinfo, ce_gi_functioninfo);
+			baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
+			baseinfo_object->is_constructed = TRUE;
+			baseinfo_object->info = g_base_info_ref(info);
+			add_next_index_zval(return_value, zinfo);
+			g_base_info_unref(info);
+		}
+	}
+}
+/* }}} */
+
+/* {{{ proto string G\Introspection\EnumInfo->getStorageType()
+                  get enum of type */
+PHP_METHOD(EnumInfo, getStorageType)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+	GITypeTag type;
+	const gchar *name;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	type = g_enum_info_get_storage_type(baseinfo_object->info);
+
+	object_init_ex(return_value, ce_gi_typetag);
+	php_g_set_enum_value(&return_value, type TSRMLS_CC);
+}
+/* }}} */
+
+/* ----------------------------------------------------------------
     G\Introspection\BaseInfo Object management
 ------------------------------------------------------------------*/
 
@@ -409,11 +708,33 @@ static const zend_function_entry gi_vfuncinfo_methods[] = {
 };
 /* }}} */
 
+/* {{{ class methods */
+static const zend_function_entry gi_regtypeinfo_methods[] = {
+	PHP_ME(RegisteredTypeInfo, getGTypeName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(RegisteredTypeInfo, getTypeInit, NULL, ZEND_ACC_PUBLIC)
+	ZEND_FE_END
+};
+/* }}} */
+
+/* {{{ class methods */
+static const zend_function_entry gi_enuminfo_methods[] = {
+	PHP_ME(EnumInfo, getNumValues, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(EnumInfo, getValue, EnumInfo_getValue_args, ZEND_ACC_PUBLIC)
+	PHP_ME(EnumInfo, getValues, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(EnumInfo, getNumMethods, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(EnumInfo, getMethod, EnumInfo_getMethod_args, ZEND_ACC_PUBLIC)
+	PHP_ME(EnumInfo, getMethods, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(EnumInfo, getStorageType, NULL, ZEND_ACC_PUBLIC)
+	ZEND_FE_END
+};
+/* }}} */
+
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(gi_Info)
 {
-	zend_class_entry base_ce, callable_ce, function_ce, signal_ce, vfunc_ce, regtype_ce, enum_ce, property_ce;
-	zend_class_entry union_ce, struct_ce, object_ce, interface_ce, arginfo_ce, constant_ce, field_ce, type_ce;
+	zend_class_entry base_ce, callable_ce, function_ce, signal_ce, vfunc_ce, regtype_ce, enum_ce;
+	zend_class_entry value_ce, property_ce, field_ce;
+	zend_class_entry union_ce, struct_ce, object_ce, interface_ce, arginfo_ce, constant_ce, type_ce;
 
 	INIT_NS_CLASS_ENTRY(base_ce, GI_NAMESPACE, "BaseInfo", gi_baseinfo_methods);
 	ce_gi_baseinfo = zend_register_internal_class(&base_ce TSRMLS_CC);
@@ -435,11 +756,11 @@ PHP_MINIT_FUNCTION(gi_Info)
 	ce_gi_vfuncinfo = zend_register_internal_class_ex(&vfunc_ce, ce_gi_callableinfo, NULL TSRMLS_CC);
 	ce_gi_vfuncinfo->create_object = gi_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(regtype_ce, GI_NAMESPACE, "RegTypeInfo", NULL);
+	INIT_NS_CLASS_ENTRY(regtype_ce, GI_NAMESPACE, "RegisteredTypeInfo", gi_regtypeinfo_methods);
 	ce_gi_regtypeinfo = zend_register_internal_class_ex(&regtype_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
 	ce_gi_regtypeinfo->create_object = gi_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(enum_ce, GI_NAMESPACE, "EnumInfo", NULL);
+	INIT_NS_CLASS_ENTRY(enum_ce, GI_NAMESPACE, "EnumInfo", gi_enuminfo_methods);
 	ce_gi_enuminfo = zend_register_internal_class_ex(&enum_ce, ce_gi_regtypeinfo, NULL TSRMLS_CC);
 	ce_gi_enuminfo->create_object = gi_baseinfo_object_create;
 
@@ -478,6 +799,10 @@ PHP_MINIT_FUNCTION(gi_Info)
 	INIT_NS_CLASS_ENTRY(type_ce, GI_NAMESPACE, "TypeInfo", NULL);
 	ce_gi_typeinfo = zend_register_internal_class_ex(&type_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
 	ce_gi_typeinfo->create_object = gi_baseinfo_object_create;
+
+	INIT_NS_CLASS_ENTRY(value_ce, GI_NAMESPACE, "ValueInfo", NULL);
+	ce_gi_valueinfo = zend_register_internal_class_ex(&value_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
+	ce_gi_valueinfo->create_object = gi_baseinfo_object_create;
 
 	return SUCCESS;
 }

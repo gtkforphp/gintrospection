@@ -1,5 +1,5 @@
 --TEST--
-G\Introspection\BaseInfo->getAttributes();
+G\Introspection\EnumInfo->getNumMethods();
 --SKIPIF--
 <?php
 if(!extension_loaded('gi')) die('skip - GI extension not available');
@@ -13,20 +13,18 @@ $repo = Gir::getDefault();
 // load the repo - we'll do GLib since it SHOULD be around
 $repo->require('GLib');
 
-// no attributes
-$baseinfo = $repo->findByName('GLib', 'Timer');
-var_dump($baseinfo->getAttributes());
+$baseinfo = $repo->findByName('GLib', 'AsciiType');
+var_dump($baseinfo->getNumMethods());
 
 // too many args
 try {
-     $baseinfo->getAttributes(1);
+     $baseinfo->getNumMethods(1);
 } catch (InvalidArgumentException $e) {
     echo $e->getMessage(), PHP_EOL;
 }
 ?>
 = DONE =
 --EXPECT--
-array(0) {
-}
-G\Introspection\BaseInfo::getAttributes() expects exactly 0 parameters, 1 given
+int(0)
+G\Introspection\EnumInfo::getNumMethods() expects exactly 0 parameters, 1 given
 = DONE =

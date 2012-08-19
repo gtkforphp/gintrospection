@@ -7,7 +7,7 @@ if(!extension_loaded('gi')) die('skip - GI extension not available');
 --FILE--
 <?php
 use G\Introspection\Repository as Gir;
-use G\Introspection\InfoTYpe as Type;
+use G\Introspection\EnumInfo;
 
 $repo = Gir::getDefault();
 
@@ -15,11 +15,10 @@ $repo = Gir::getDefault();
 $repo->require('GLib');
 
 // get the Timer baseinfo
-$baseinfo = $repo->findByName('GLib', 'Timer');
+$baseinfo = $repo->findByName('GLib', 'BookmarkFileError');
+$valinfo = $baseinfo->getValue(0);
 
-var_dump($baseinfo->getContainer());
-
-// TODO HERE _ find a baseinfo to grab with a container
+var_dump($valinfo->getContainer() instanceof EnumInfo);
 
 // too many args
 try {
@@ -30,9 +29,6 @@ try {
 ?>
 = DONE =
 --EXPECT--
-NULL
-some object here
+bool(true)
 G\Introspection\BaseInfo::getContainer() expects exactly 0 parameters, 1 given
 = DONE =
---XFAIL--
-Need to find an info in a typelib with container to test this on

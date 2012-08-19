@@ -460,6 +460,10 @@ PHP_METHOD(Repository, getInfo)
 
 	total = g_irepository_get_n_infos(repository_object->repo, name);
 
+	if (total == 0) {
+		RETURN_NULL();
+	}
+
 	/* our index must be between 0 and maximum number infos */
 	if (index < 0 || index > total) {
 		zend_throw_exception_ex(spl_ce_InvalidArgumentException, 0 TSRMLS_CC,

@@ -1,5 +1,5 @@
 --TEST--
-G\Introspection\Repository->getInfo(); in loop
+G\Introspection\EnumInfo->getValue(); in loop
 --SKIPIF--
 <?php
 if(!extension_loaded('gi')) die('skip - GI extension not available');
@@ -7,22 +7,24 @@ if(!extension_loaded('gi')) die('skip - GI extension not available');
 --FILE--
 <?php
 use G\Introspection\Repository as Gir;
-use G\Introspection\BaseInfo;
+use G\Introspection\ValueInfo;
 
 $repo = Gir::getDefault();
 
 // load the repo - we'll do GLib since it SHOULD be around
 $repo->require('GLib');
 
-// get our total
-$total = $repo->getNumInfos('GLib');
+// has more then one count
+$baseinfo = $repo->findByName('GLib', 'DateMonth');
+
+$total = $baseinfo->getNumValues();
 
 // counter
 $found = 0;
 
 for($i = 0; $i < $total; $i++) {
-     $baseinfo = $repo->getInfo('GLib', $i);
-     if($baseinfo instanceof BaseInfo) {
+     $valueinfo = $baseinfo->getValue($i);
+     if($valueinfo instanceof ValueInfo) {
           $found++;
      }
 }

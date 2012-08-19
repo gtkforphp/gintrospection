@@ -10,9 +10,13 @@ TODO
  1. typelib.c - g_typelib_new_from_mapped_file - need glib and gio
  1. typelib.c - g_typelib_symbol - need glib
 
- 1. info.c - (baseinfo) g_base_info_get_attribute - is done but test is xfail until I find a known attribute to test with
- 1. info.c - (baseinfo) g_base_info_iterate_attributes - is done but test is xfail until I find a known attribute to test with
- 1. info.c - (baseinfo) g_base_info_get_container - is done but test is xfail until I find a known item with a container
+ 1. info.c - (registeredtypeinfo) g_registered_type_info_get_g_type - need gobject for gtype return
+
+TEST
+===
+ 1. enuminfo get(Num)Method(s) tests are bogus at the moment, they need an enum with methods to test on
+ 1. baseinfo getattribute and getattributes also have bogus tests since nothing has attributes yet
+ 1. Someday a custom typelib with all items would be great to for testing!
 
 IGNORED
 ===
