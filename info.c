@@ -634,6 +634,37 @@ PHP_METHOD(EnumInfo, getStorageType)
 /* }}} */
 
 /* ----------------------------------------------------------------
+    G\Introspection\ValueInfo class API
+------------------------------------------------------------------*/
+
+/* {{{ proto string G\Introspection\ValueInfo->getValue()
+                  this is a gint64 (eww) so we push it into
+                  a string.  Can later be juggled if that
+                  is desired but user takes reposibility for overflows */
+PHP_METHOD(ValueInfo, getValue)
+{
+
+	gi_baseinfo_object *baseinfo_object;
+	gchar *value;
+	gint64 item;
+
+	PHP_GI_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters_none()) {
+		return;
+	}
+	PHP_GI_RESTORE_ERRORS
+
+	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+
+	item = g_value_info_get_value(baseinfo_object->info);
+
+	value = g_strdup_printf("%"G_GINT64_FORMAT, item);
+	RETVAL_STRING(value, 1);
+	g_free(value);
+}
+/* }}} */
+
+/* ----------------------------------------------------------------
     G\Introspection\BaseInfo Object management
 ------------------------------------------------------------------*/
 
@@ -729,6 +760,13 @@ static const zend_function_entry gi_enuminfo_methods[] = {
 };
 /* }}} */
 
+/* {{{ class methods */
+static const zend_function_entry gi_valueinfo_methods[] = {
+	PHP_ME(ValueInfo, getValue, NULL, ZEND_ACC_PUBLIC)
+	ZEND_FE_END
+};
+/* }}} */
+
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(gi_Info)
 {
@@ -800,7 +838,7 @@ PHP_MINIT_FUNCTION(gi_Info)
 	ce_gi_typeinfo = zend_register_internal_class_ex(&type_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
 	ce_gi_typeinfo->create_object = gi_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(value_ce, GI_NAMESPACE, "ValueInfo", NULL);
+	INIT_NS_CLASS_ENTRY(value_ce, GI_NAMESPACE, "ValueInfo", gi_valueinfo_methods);
 	ce_gi_valueinfo = zend_register_internal_class_ex(&value_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
 	ce_gi_valueinfo->create_object = gi_baseinfo_object_create;
 
