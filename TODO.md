@@ -17,6 +17,7 @@ TEST
  1. enuminfo get(Num)Method(s) tests are bogus at the moment, they need an enum with methods to test on
  1. baseinfo getattribute and getattributes also have bogus tests since nothing has attributes yet
  1. Someday a custom typelib with all items would be great to for testing!
+ 1. discriminator stuff can't be propertly tested with no discriminator to test
 
 IGNORED
 ===
