@@ -41,6 +41,6 @@ If you want to use a non-standard location for your PHP use
 make && make test && make install
 </pre>
 
-`make install` copies `gi.so` to the right location, but you still need to enable the module
+`make install` copies `gintrospection.so` to the right location, but you still need to enable the module
 in your php.ini file.  Although the extension can be used with a webserver, it's recommended
 you only use this with a cli PHP install.
