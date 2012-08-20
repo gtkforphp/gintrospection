@@ -1,12 +1,12 @@
 --TEST--
-gi class listing
+gintrospection class listing
 --SKIPIF--
 <?php
-if(!extension_loaded('gi')) die('skip - GI extension not available');
+include __DIR__ . '/skipif.inc';
 ?>
 --FILE--
 <?php
-$ext = new ReflectionExtension('gi');
+$ext = new ReflectionExtension('gintrospection');
 var_dump($ext->getClassNames());
 ?>
 = DONE =

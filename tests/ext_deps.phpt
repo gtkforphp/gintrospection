@@ -2,17 +2,19 @@
 gi extension dependencies
 --SKIPIF--
 <?php
-if(!extension_loaded('gi')) die('skip - GI extension not available');
+include __DIR__ . '/skipif.inc';
 ?>
 --FILE--
 <?php
-$ext = new ReflectionExtension('gi');
+$ext = new ReflectionExtension('gintrospection');
 var_dump($ext->getDependencies());
 ?>
 = DONE =
 --EXPECT--
-array(1) {
-  ["g"]=>
+array(2) {
+  ["glib"]=>
+  string(8) "Required"
+  ["gobject"]=>
   string(8) "Required"
 }
 = DONE =

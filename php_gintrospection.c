@@ -16,26 +16,24 @@
   +----------------------------------------------------------------------+
 */
 
-#include "php_gi.h"
+#include "php_gintrospection.h"
 
-/* Requires the G system tools for unicode/string classes, gerror handling
-   enums and more */
-static const zend_module_dep gi_deps[] = {
-	ZEND_MOD_REQUIRED("g")
+/* Requires glib for some base types and gobject for type system tools  */
+static const zend_module_dep gintrospection_deps[] = {
+	ZEND_MOD_REQUIRED("glib")
+	ZEND_MOD_REQUIRED("gobject")
 	ZEND_MOD_END
 };
 /* }}} */
 
 /* {{{ PHP_MINIT_FUNCTION
  */
-PHP_MINIT_FUNCTION(gi)
+PHP_MINIT_FUNCTION(gintrospection)
 {
-	g_type_init();
-
-	PHP_MINIT(gi_Repository)(INIT_FUNC_ARGS_PASSTHRU);
-	PHP_MINIT(gi_Typelib)(INIT_FUNC_ARGS_PASSTHRU);
-	PHP_MINIT(gi_Info)(INIT_FUNC_ARGS_PASSTHRU);
-	PHP_MINIT(gi_Enums)(INIT_FUNC_ARGS_PASSTHRU);
+	PHP_MINIT(gintrospection_Repository)(INIT_FUNC_ARGS_PASSTHRU);
+	PHP_MINIT(gintrospection_Typelib)(INIT_FUNC_ARGS_PASSTHRU);
+	PHP_MINIT(gintrospection_Info)(INIT_FUNC_ARGS_PASSTHRU);
+	PHP_MINIT(gintrospection_Enums)(INIT_FUNC_ARGS_PASSTHRU);
 
 	return SUCCESS;
 }
@@ -44,35 +42,35 @@ PHP_MINIT_FUNCTION(gi)
 
 /* {{{ PHP_MINFO_FUNCTION
  */
-PHP_MINFO_FUNCTION(gi)
+PHP_MINFO_FUNCTION(gintrospection)
 {
 	php_info_print_table_start();
-	php_info_print_table_header(2, "Gobject Introspection support", "enabled");
-	php_info_print_table_row(2, "Extension Version", PHP_GI_VERSION);
+	php_info_print_table_header(2, "GIntrospection support", "enabled");
+	php_info_print_table_row(2, "Extension Version", PHP_GINTROSPECTION_VERSION);
 	php_info_print_table_end();
 }
 /* }}} */
 
-/* {{{ gi_module_entry
+/* {{{ gintrospection_module_entry
  */
-zend_module_entry gi_module_entry = {
+zend_module_entry gintrospection_module_entry = {
 	STANDARD_MODULE_HEADER_EX,
 	NULL,
-	gi_deps,
-	"gi",
+	gintrospection_deps,
+	"gintrospection",
 	NULL,
-	PHP_MINIT(gi),
+	PHP_MINIT(gintrospection),
 	NULL,
 	NULL,
 	NULL,
-	PHP_MINFO(gi),
-	PHP_GI_VERSION,
+	PHP_MINFO(gintrospection),
+	PHP_GINTROSPECTION_VERSION,
 	STANDARD_MODULE_PROPERTIES
 };
 /* }}} */
 
-#ifdef COMPILE_DL_GI
-ZEND_GET_MODULE(gi)
+#ifdef COMPILE_DL_GINTROSPECTION
+ZEND_GET_MODULE(gintrospection)
 #endif
 
 /*

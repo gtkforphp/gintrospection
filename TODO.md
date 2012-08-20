@@ -7,7 +7,7 @@ TODO
 
  1. typelib.c - g_typelib_new_from_memory - need glib
  1. typelib.c - g_typelib_new_from_const_memory - need glib
- 1. typelib.c - g_typelib_new_from_mapped_file - need glib and gio
+ 1. typelib.c - g_typelib_new_from_mapped_file - need glib and gio?
  1. typelib.c - g_typelib_symbol - need glib
 
  1. info.c - (registeredtypeinfo) g_registered_type_info_get_g_type - need gobject for gtype return
@@ -29,14 +29,6 @@ IGNORED
 
 NOTES
 ===
-Currently we have a chicken and egg issue going on with the extension here - it is going to need to dep
-on both glib (for basic types wrappers) and gobject (for object stuff) extensions at some point when we're
-ready to do the importing.  For now the focus is on getting all the introspection stuff working so the
-generator can be created. After the generator works the dep tree will be glib <- gobject <- gintrospection.
-Yes that means some importing and renaming and moving GError stuff to use glib stuff
-(which will be namespace G)
-
-need to rename this extension to gintrospection (the module) - will leave the namespace/etc as is
 possibly add an "importNamespace" to do class_alias help
 
 baseinfo might be good to get some built in mangling? we might wait for import to do that

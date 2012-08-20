@@ -2,7 +2,7 @@
 G\Introspection\UnionInfo->getMethods();
 --SKIPIF--
 <?php
-if(!extension_loaded('gi')) die('skip - GI extension not available');
+include __DIR__ . '/../skipif.inc';
 ?>
 --FILE--
 <?php

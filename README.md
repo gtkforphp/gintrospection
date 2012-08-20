@@ -1,20 +1,23 @@
-Gi
+G\Introspection
 =============
-The gtkforphp gi extension provides languages bindings for the Gobject Introspection (gi) library.
-Documentation and information about the GI library can be found at http://developer.gnome.org/gi/stable/
+The gtkforphp gintrospection extension provides languages bindings for the Gobject Introspection library.
+Documentation and information about the library can be found at http://developer.gnome.org/gi/stable/
 
 The bindings provide twofold functionality - the ability to read and iterate over information in a
 typelib, and the ability to import libraries directly into PHP as "faux" modules.
 
-You can send comments, patches, questions [here on github](https://github.com/gtkforphp/gi/issues)
+You can send comments, patches, questions [here on github](https://github.com/gtkforphp/gintrospection/issues)
 
 This is still an experimental extension.
 
 Installing/Configuring
 ======================
 
-This extension requires the gtkforphp/g extension as a dependency - for more information see
-https://github.com/gtkforphp/g
+This extension requires the gtkforphp/glib extension as a dependency - for more information see
+https://github.com/gtkforphp/glib
+
+This extension requires the gtkforphp/gobject extension as a dependency - for more information see
+https://github.com/gtkforphp/gobject
 
 This extension requires the gobject introspection library development files.  You can build the package
 manually or use your system's package manager.  For example on ubuntu use

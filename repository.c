@@ -16,14 +16,14 @@
   +----------------------------------------------------------------------+
 */
 
-#include "php_gi.h"
-#include <php_g_public.h>
+#include "php_gintrospection.h"
+#include <php_glib_public.h>
 
-zend_class_entry *ce_gi_repository;
-static zend_object_handlers gi_repository_object_handlers;
+zend_class_entry *ce_gintrospection_repository;
+static zend_object_handlers gintrospection_repository_object_handlers;
 
 /* repository info */
-struct _gi_repository_object {
+struct _gintrospection_repository_object {
 	zend_object std;
 	zend_bool is_constructed;
 	GIRepository* repo;
@@ -105,11 +105,11 @@ ZEND_END_ARG_INFO()
                  Private constructor placeholder (does nothing) */
 PHP_METHOD(Repository, __construct)
 {
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 }
 /* }}} */
 
@@ -117,16 +117,16 @@ PHP_METHOD(Repository, __construct)
                     Singleton constructor for process specific default repository */
 PHP_METHOD(Repository, getDefault)
 {
-	gi_repository_object *repository_object;
+	gintrospection_repository_object *repository_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	object_init_ex(return_value, ce_gi_repository);
-	repository_object = (gi_repository_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, ce_gintrospection_repository);
+	repository_object = (gintrospection_repository_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	repository_object->repo = g_irepository_get_default();
 	repository_object->is_constructed = TRUE;
 }
@@ -140,11 +140,11 @@ PHP_METHOD(Repository, prependSearchPath)
 	char *path;
 	int  path_len;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &path, &path_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
 	g_irepository_prepend_search_path(path);
 }
@@ -158,11 +158,11 @@ PHP_METHOD(Repository, getSearchPath)
 	GSList   *list;
 	guint    len, i;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
 	list = g_irepository_get_search_path();
 	len  = g_slist_length(list);
@@ -183,18 +183,18 @@ PHP_METHOD(Repository, getSearchPath)
 PHP_METHOD(Repository, isRegistered)
 {
 
-	gi_repository_object *repository_object;
+	gintrospection_repository_object *repository_object;
 	gchar *name, *version = NULL;
 	int name_len, version_len;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|s", &name, &name_len,
 				&version, &version_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	repository_object = (gintrospection_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_BOOL(g_irepository_is_registered(repository_object->repo, name, version));
 }
@@ -205,20 +205,20 @@ PHP_METHOD(Repository, isRegistered)
 PHP_METHOD(Repository, findByName)
 {
 
-	gi_repository_object *repository_object;
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_repository_object *repository_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	gchar *name, *find;
 	int name_len, find_len;
 	GIBaseInfo *info;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &name, &name_len,
 				&find, &find_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	repository_object = (gintrospection_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	/* This will bomb and segfault!! if we don't check to make sure the typelib is loaded */
 	if (FALSE == g_irepository_is_registered(repository_object->repo, name, NULL)) {
@@ -233,8 +233,8 @@ PHP_METHOD(Repository, findByName)
 		RETURN_NULL();
 	}
 
-	object_init_ex(return_value, php_gi_get_info_ce(info));
-	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, php_gintrospection_get_info_ce(info));
+	baseinfo_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	baseinfo_object->is_constructed = TRUE;
 	baseinfo_object->info = g_base_info_ref(info);
 	g_base_info_unref(info);
@@ -246,8 +246,8 @@ PHP_METHOD(Repository, findByName)
 PHP_METHOD(Repository, require)
 {
 
-	gi_repository_object *repository_object;
-	gi_typelib_object *typelib_object;
+	gintrospection_repository_object *repository_object;
+	gintrospection_typelib_object *typelib_object;
 	gchar *name, *version = NULL;
 	int name_len, version_len;
 	zval *flags = NULL;
@@ -255,27 +255,27 @@ PHP_METHOD(Repository, require)
 	GITypelib *typelib;
 	GError *error = NULL;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|sO!", &name, &name_len,
-				&version, &version_len, &flags, ce_gi_repositoryloadflags)) {
+				&version, &version_len, &flags, ce_gintrospection_repositoryloadflags)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	object_init_ex(return_value, ce_gi_typelib);
+	object_init_ex(return_value, ce_gintrospection_typelib);
 
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
-	typelib_object = (gi_typelib_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	repository_object = (gintrospection_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	typelib_object = (gintrospection_typelib_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	typelib_object->is_constructed = TRUE;
 
 	if (flags) {
-		loadflags = php_g_get_enum_value(&flags TSRMLS_CC);
+		loadflags = php_glib_get_enum_value(&flags TSRMLS_CC);
 	}
 
 	typelib_object->typelib = g_irepository_require(repository_object->repo, name, version,
 									loadflags, &error);
 
-	if (php_g_handle_gerror(&error TSRMLS_CC)) {
+	if (php_glib_handle_gerror(&error TSRMLS_CC)) {
 		RETURN_FALSE;
 	}
 
@@ -291,8 +291,8 @@ PHP_METHOD(Repository, require)
 PHP_METHOD(Repository, requirePrivate)
 {
 
-	gi_repository_object *repository_object;
-	gi_typelib_object *typelib_object;
+	gintrospection_repository_object *repository_object;
+	gintrospection_typelib_object *typelib_object;
 	gchar *name, *path, *version = NULL;
 	int name_len, path_len, version_len;
 	zval *flags = NULL;
@@ -300,27 +300,27 @@ PHP_METHOD(Repository, requirePrivate)
 	GITypelib *typelib;
 	GError *error = NULL;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss|sO!", &path, &path_len,
-				&name, &name_len, &version, &version_len, &flags, ce_gi_repositoryloadflags)) {
+				&name, &name_len, &version, &version_len, &flags, ce_gintrospection_repositoryloadflags)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	object_init_ex(return_value, ce_gi_typelib);
+	object_init_ex(return_value, ce_gintrospection_typelib);
 
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
-	typelib_object = (gi_typelib_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	repository_object = (gintrospection_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	typelib_object = (gintrospection_typelib_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	typelib_object->is_constructed = TRUE;
 
 	if (flags) {
-		loadflags = php_g_get_enum_value(&flags TSRMLS_CC);
+		loadflags = php_glib_get_enum_value(&flags TSRMLS_CC);
 	}
 
 	typelib_object->typelib = g_irepository_require_private(repository_object->repo, path, name, version,
 									loadflags, &error);
 
-	if (php_g_handle_gerror(&error TSRMLS_CC)) {
+	if (php_glib_handle_gerror(&error TSRMLS_CC)) {
 		RETURN_FALSE;
 	}
 
@@ -335,19 +335,19 @@ PHP_METHOD(Repository, requirePrivate)
 PHP_METHOD(Repository, getDependencies)
 {
 
-	gi_repository_object *repository_object;
+	gintrospection_repository_object *repository_object;
 	gchar **dependencies;
 	gssize i;
 	gchar *name;
 	int name_len;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	repository_object = (gintrospection_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	/* This will bomb and segfault!! if we don't check to make sure the typelib is loaded */
 	if (FALSE == g_irepository_is_registered(repository_object->repo, name, NULL)) {
@@ -376,17 +376,17 @@ PHP_METHOD(Repository, getDependencies)
 PHP_METHOD(Repository, getLoadedNamespaces)
 {
 
-	gi_repository_object *repository_object;
+	gintrospection_repository_object *repository_object;
 	gchar **namespaces;
 	gssize i;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	repository_object = (gintrospection_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	namespaces = g_irepository_get_loaded_namespaces(repository_object->repo);
 
@@ -405,17 +405,17 @@ PHP_METHOD(Repository, getLoadedNamespaces)
 PHP_METHOD(Repository, getNumInfos)
 {
 
-	gi_repository_object *repository_object;
+	gintrospection_repository_object *repository_object;
 	gchar *name;
 	int name_len;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	repository_object = (gintrospection_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	/* This will bomb and segfault!! if we don't check to make sure the typelib is loaded */
 	if (FALSE == g_irepository_is_registered(repository_object->repo, name, NULL)) {
@@ -434,22 +434,22 @@ PHP_METHOD(Repository, getNumInfos)
 PHP_METHOD(Repository, getInfo)
 {
 
-	gi_repository_object *repository_object;
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_repository_object *repository_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	long index;
 	gchar *name;
 	gint total;
 	int name_len;
 	GIBaseInfo *info;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sl", &name, &name_len,
 				&index)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	repository_object = (gintrospection_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	/* This will bomb and segfault!! if we don't check to make sure the typelib is loaded */
 	if (FALSE == g_irepository_is_registered(repository_object->repo, name, NULL)) {
@@ -477,8 +477,8 @@ PHP_METHOD(Repository, getInfo)
 		RETURN_NULL();
 	}
 
-	object_init_ex(return_value, php_gi_get_info_ce(info));
-	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, php_gintrospection_get_info_ce(info));
+	baseinfo_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	baseinfo_object->is_constructed = TRUE;
 	baseinfo_object->info = g_base_info_ref(info);
 	g_base_info_unref(info);
@@ -491,19 +491,19 @@ PHP_METHOD(Repository, getInfo)
 PHP_METHOD(Repository, getInfos)
 {
 
-	gi_repository_object *repository_object;
+	gintrospection_repository_object *repository_object;
 	gint total, i;
 	gchar *name;
 	int name_len;
 	GIBaseInfo *info;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	repository_object = (gintrospection_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	/* This will bomb and segfault!! if we don't check to make sure the typelib is loaded */
 	if (FALSE == g_irepository_is_registered(repository_object->repo, name, NULL)) {
@@ -517,7 +517,7 @@ PHP_METHOD(Repository, getInfos)
 	array_init(return_value);
 
 	for (i = 0; i < total; i++) {
-		gi_baseinfo_object *baseinfo_object;
+		gintrospection_baseinfo_object *baseinfo_object;
 		zval *zinfo;
 
 		info = g_irepository_get_info(repository_object->repo, name, i);
@@ -526,8 +526,8 @@ PHP_METHOD(Repository, getInfos)
 			continue;
 		} else {
 			MAKE_STD_ZVAL(zinfo);
-			object_init_ex(zinfo, php_gi_get_info_ce(info));
-			baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
+			object_init_ex(zinfo, php_gintrospection_get_info_ce(info));
+			baseinfo_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
 			baseinfo_object->is_constructed = TRUE;
 			baseinfo_object->info = g_base_info_ref(info);
 			add_next_index_zval(return_value, zinfo);
@@ -542,17 +542,17 @@ PHP_METHOD(Repository, getInfos)
 PHP_METHOD(Repository, getTypelibPath)
 {
 
-	gi_repository_object *repository_object;
+	gintrospection_repository_object *repository_object;
 	gchar *name;
 	int name_len;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	repository_object = (gintrospection_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	/* This will bomb and segfault!! if we don't check to make sure the typelib is loaded */
 	if (FALSE == g_irepository_is_registered(repository_object->repo, name, NULL)) {
@@ -571,18 +571,18 @@ PHP_METHOD(Repository, getTypelibPath)
 PHP_METHOD(Repository, getSharedLibrary)
 {
 
-	gi_repository_object *repository_object;
+	gintrospection_repository_object *repository_object;
 	gchar *name;
 	const gchar *path = NULL;
 	int name_len;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	repository_object = (gintrospection_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	/* This will bomb and segfault!! if we don't check to make sure the typelib is loaded */
 	if (FALSE == g_irepository_is_registered(repository_object->repo, name, NULL)) {
@@ -606,17 +606,17 @@ PHP_METHOD(Repository, getSharedLibrary)
 PHP_METHOD(Repository, getVersion)
 {
 
-	gi_repository_object *repository_object;
+	gintrospection_repository_object *repository_object;
 	gchar *name;
 	int name_len;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	repository_object = (gintrospection_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	/* This will bomb and segfault!! if we don't check to make sure the typelib is loaded */
 	if (FALSE == g_irepository_is_registered(repository_object->repo, name, NULL)) {
@@ -634,17 +634,17 @@ PHP_METHOD(Repository, getVersion)
 PHP_METHOD(Repository, getCPrefix)
 {
 
-	gi_repository_object *repository_object;
+	gintrospection_repository_object *repository_object;
 	gchar *name;
 	int name_len;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	repository_object = (gintrospection_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	/* This will bomb and segfault!! if we don't check to make sure the typelib is loaded */
 	if (FALSE == g_irepository_is_registered(repository_object->repo, name, NULL)) {
@@ -672,15 +672,15 @@ PHP_METHOD(Repository, dump)
 	gboolean worked = FALSE;
 	GError *error = NULL;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &files, &files_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
 	worked = g_irepository_dump(files, &error);
 
-	if (php_g_handle_gerror(&error TSRMLS_CC)) {
+	if (php_glib_handle_gerror(&error TSRMLS_CC)) {
 		RETURN_FALSE;
 	}
 
@@ -693,18 +693,18 @@ PHP_METHOD(Repository, dump)
 PHP_METHOD(Repository, enumerateVersions)
 {
 
-	gi_repository_object *repository_object;
+	gintrospection_repository_object *repository_object;
 	gchar *name;
 	int name_len;
 	GList *versions, *item;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	repository_object = (gi_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	repository_object = (gintrospection_repository_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	versions = g_irepository_enumerate_versions(repository_object->repo, name);
 
@@ -722,10 +722,10 @@ PHP_METHOD(Repository, enumerateVersions)
     G\Introspection\Repository Object management
 ------------------------------------------------------------------*/
 
-/* {{{ gi_repository_object_free */
-static void gi_repository_object_free(void *object TSRMLS_DC)
+/* {{{ gintrospection_repository_object_free */
+static void gintrospection_repository_object_free(void *object TSRMLS_DC)
 {
-	gi_repository_object *repository_object = (gi_repository_object *)object;
+	gintrospection_repository_object *repository_object = (gintrospection_repository_object *)object;
 
 	zend_object_std_dtor(&repository_object->std TSRMLS_CC);
 	repository_object->repo = NULL;
@@ -735,13 +735,13 @@ static void gi_repository_object_free(void *object TSRMLS_DC)
 }
 /* }}} */
 
-/* {{{ gi_repository_object_create */
-static zend_object_value gi_repository_object_create(zend_class_entry *ce TSRMLS_DC)
+/* {{{ gintrospection_repository_object_create */
+static zend_object_value gintrospection_repository_object_create(zend_class_entry *ce TSRMLS_DC)
 {
 	zend_object_value retval;
-	gi_repository_object *repository_object;
+	gintrospection_repository_object *repository_object;
 
-	repository_object = ecalloc(1, sizeof(gi_repository_object));
+	repository_object = ecalloc(1, sizeof(gintrospection_repository_object));
 	zend_object_std_init((zend_object *) repository_object, ce TSRMLS_CC);
 	repository_object->is_constructed = FALSE;
 	repository_object->repo = NULL;
@@ -750,9 +750,9 @@ static zend_object_value gi_repository_object_create(zend_class_entry *ce TSRMLS
 
 	retval.handle = zend_objects_store_put(repository_object,
 		(zend_objects_store_dtor_t) zend_objects_destroy_object,
-		(zend_objects_free_object_storage_t) gi_repository_object_free,
+		(zend_objects_free_object_storage_t) gintrospection_repository_object_free,
 		NULL TSRMLS_CC);
-	retval.handlers = &gi_repository_object_handlers;
+	retval.handlers = &gintrospection_repository_object_handlers;
 	return retval;
 }
 /* }}} */
@@ -787,15 +787,15 @@ static const zend_function_entry gi_repository_methods[] = {
 /* }}} */
 
 /* {{{ PHP_MINIT_FUNCTION */
-PHP_MINIT_FUNCTION(gi_Repository)
+PHP_MINIT_FUNCTION(gintrospection_Repository)
 {
 	zend_class_entry ce;
-	INIT_NS_CLASS_ENTRY(ce, GI_NAMESPACE, "Repository", gi_repository_methods);
-	ce_gi_repository = zend_register_internal_class(&ce TSRMLS_CC);
-	ce_gi_repository->ce_flags |= ZEND_ACC_FINAL;
+	INIT_NS_CLASS_ENTRY(ce, GINTROSPECTION_NAMESPACE, "Repository", gi_repository_methods);
+	ce_gintrospection_repository = zend_register_internal_class(&ce TSRMLS_CC);
+	ce_gintrospection_repository->ce_flags |= ZEND_ACC_FINAL;
 
-	ce_gi_repository->create_object = gi_repository_object_create;
-	memcpy(&gi_repository_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+	ce_gintrospection_repository->create_object = gintrospection_repository_object_create;
+	memcpy(&gintrospection_repository_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 
 	return SUCCESS;
 }

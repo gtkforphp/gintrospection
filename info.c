@@ -16,62 +16,62 @@
   +----------------------------------------------------------------------+
 */
 
-#include "php_gi.h"
+#include "php_gintrospection.h"
 
-zend_class_entry *ce_gi_vfuncinfo;
-zend_class_entry *ce_gi_signalinfo;
-zend_class_entry *ce_gi_functioninfo;
-zend_class_entry *ce_gi_callableinfo;
-zend_class_entry *ce_gi_unioninfo;
-zend_class_entry *ce_gi_structinfo;
-zend_class_entry *ce_gi_objectinfo;
-zend_class_entry *ce_gi_interfaceinfo;
-zend_class_entry *ce_gi_enuminfo;
-zend_class_entry *ce_gi_regtypeinfo;
-zend_class_entry *ce_gi_arginfo;
-zend_class_entry *ce_gi_constantinfo;
-zend_class_entry *ce_gi_fieldinfo;
-zend_class_entry *ce_gi_propertyinfo;
-zend_class_entry *ce_gi_typeinfo;
-zend_class_entry *ce_gi_baseinfo;
-zend_class_entry *ce_gi_valueinfo;
+zend_class_entry *ce_gintrospection_vfuncinfo;
+zend_class_entry *ce_gintrospection_signalinfo;
+zend_class_entry *ce_gintrospection_functioninfo;
+zend_class_entry *ce_gintrospection_callableinfo;
+zend_class_entry *ce_gintrospection_unioninfo;
+zend_class_entry *ce_gintrospection_structinfo;
+zend_class_entry *ce_gintrospection_objectinfo;
+zend_class_entry *ce_gintrospection_interfaceinfo;
+zend_class_entry *ce_gintrospection_enuminfo;
+zend_class_entry *ce_gintrospection_regtypeinfo;
+zend_class_entry *ce_gintrospection_arginfo;
+zend_class_entry *ce_gintrospection_constantinfo;
+zend_class_entry *ce_gintrospection_fieldinfo;
+zend_class_entry *ce_gintrospection_propertyinfo;
+zend_class_entry *ce_gintrospection_typeinfo;
+zend_class_entry *ce_gintrospection_baseinfo;
+zend_class_entry *ce_gintrospection_valueinfo;
 
 /* {{{ exported function to take a gerror, throw an exception, and clear the error */
-zend_class_entry* php_gi_get_info_ce(GIBaseInfo *info)
+zend_class_entry* php_gintrospection_get_info_ce(GIBaseInfo *info)
 {
 	if(GI_IS_VFUNC_INFO(info)) {
-		return ce_gi_vfuncinfo;
+		return ce_gintrospection_vfuncinfo;
 	} else if (GI_IS_SIGNAL_INFO(info)) {
-		return ce_gi_signalinfo;
+		return ce_gintrospection_signalinfo;
 	} else if (GI_IS_FUNCTION_INFO(info)) {
-		return ce_gi_functioninfo;
+		return ce_gintrospection_functioninfo;
 	} else if (GI_IS_CALLABLE_INFO(info)) {
-		return ce_gi_callableinfo;
+		return ce_gintrospection_callableinfo;
 	} else if (GI_IS_UNION_INFO(info)) {
-		return ce_gi_unioninfo;
+		return ce_gintrospection_unioninfo;
 	} else if (GI_IS_STRUCT_INFO(info)) {
-		return ce_gi_structinfo;
+		return ce_gintrospection_structinfo;
 	} else if (GI_IS_OBJECT_INFO(info)) {
-		return ce_gi_objectinfo;
+		return ce_gintrospection_objectinfo;
 	} else if (GI_IS_INTERFACE_INFO(info)) {
-		return ce_gi_interfaceinfo;
+		return ce_gintrospection_interfaceinfo;
 	} else if (GI_IS_ENUM_INFO(info)) {
-		return ce_gi_enuminfo;
+		return ce_gintrospection_enuminfo;
 	} else if (GI_IS_REGISTERED_TYPE_INFO(info)) {
-		return ce_gi_regtypeinfo;
+		return ce_gintrospection_regtypeinfo;
 	} else if (GI_IS_ARG_INFO(info)) {
-		return ce_gi_arginfo;
+		return ce_gintrospection_arginfo;
 	} else if (GI_IS_CONSTANT_INFO(info)) {
-		return ce_gi_constantinfo;
+		return ce_gintrospection_constantinfo;
 	} else if (GI_IS_FIELD_INFO(info)) {
-		return ce_gi_fieldinfo;
+		return ce_gintrospection_fieldinfo;
 	} else if (GI_IS_PROPERTY_INFO(info)) {
-		return ce_gi_propertyinfo;
+		return ce_gintrospection_propertyinfo;
 	} else if ( GI_IS_TYPE_INFO(info)) {
-		return ce_gi_typeinfo;
+		return ce_gintrospection_typeinfo;
 	}
 
-	return ce_gi_baseinfo;
+	return ce_gintrospection_baseinfo;
 }
 /* }}} */
 
@@ -91,11 +91,11 @@ ZEND_END_ARG_INFO()
                  Private constructor placeholder (does nothing) */
 PHP_METHOD(BaseInfo, __construct)
 {
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 }
 /* }}} */
 
@@ -104,22 +104,22 @@ PHP_METHOD(BaseInfo, __construct)
 PHP_METHOD(BaseInfo, getType)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	GIInfoType type;
 	const gchar *name;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	type = g_base_info_get_type(baseinfo_object->info);
 
-	object_init_ex(return_value, ce_gi_infotype);
-	php_g_set_enum_value(&return_value, type TSRMLS_CC);
+	object_init_ex(return_value, ce_gintrospection_infotype);
+	php_glib_set_enum_value(&return_value, type TSRMLS_CC);
 }
 /* }}} */
 
@@ -128,17 +128,17 @@ PHP_METHOD(BaseInfo, getType)
 PHP_METHOD(BaseInfo, getTypeName)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	GIInfoType type;
 	const gchar *name;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	type = g_base_info_get_type(baseinfo_object->info);
 	name = g_info_type_to_string(type);
@@ -152,15 +152,15 @@ PHP_METHOD(BaseInfo, getTypeName)
 PHP_METHOD(BaseInfo, getName)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_STRING(g_base_info_get_name(baseinfo_object->info), 1);
 }
@@ -171,15 +171,15 @@ PHP_METHOD(BaseInfo, getName)
 PHP_METHOD(BaseInfo, getNameSpace)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_STRING(g_base_info_get_namespace(baseinfo_object->info), 1);
 }
@@ -190,15 +190,15 @@ PHP_METHOD(BaseInfo, getNameSpace)
 PHP_METHOD(BaseInfo, isDeprecated)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_BOOL(g_base_info_is_deprecated(baseinfo_object->info));
 }
@@ -209,18 +209,18 @@ PHP_METHOD(BaseInfo, isDeprecated)
 PHP_METHOD(BaseInfo, getAttribute)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	gchar *name;
 	int name_len;
 	const gchar *value;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	value = g_base_info_get_attribute(baseinfo_object->info, name);
 
@@ -236,17 +236,17 @@ PHP_METHOD(BaseInfo, getAttribute)
 PHP_METHOD(BaseInfo, getAttributes)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	GIAttributeIter iter = { 0, };
 	gchar *name, *value;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	array_init(return_value);
 	while (g_base_info_iterate_attributes (baseinfo_object->info, &iter, &name, &value)) {
@@ -261,16 +261,16 @@ PHP_METHOD(BaseInfo, getAttributes)
 PHP_METHOD(BaseInfo, getContainer)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	GIBaseInfo *info;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	info = g_base_info_get_container(baseinfo_object->info);
 
@@ -278,8 +278,8 @@ PHP_METHOD(BaseInfo, getContainer)
 		RETURN_NULL();
 	}
 
-	object_init_ex(return_value, php_gi_get_info_ce(info));
-	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, php_gintrospection_get_info_ce(info));
+	baseinfo_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	baseinfo_object->is_constructed = TRUE;
 	baseinfo_object->info = g_base_info_ref(info);
 	g_base_info_unref(info);
@@ -291,19 +291,19 @@ PHP_METHOD(BaseInfo, getContainer)
 PHP_METHOD(BaseInfo, getTypelib)
 {
 
-	gi_baseinfo_object *baseinfo_object;
-	gi_typelib_object *typelib_object;
+	gintrospection_baseinfo_object *baseinfo_object;
+	gintrospection_typelib_object *typelib_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
-	object_init_ex(return_value, ce_gi_typelib);
-	typelib_object = (gi_typelib_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, ce_gintrospection_typelib);
+	typelib_object = (gintrospection_typelib_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	typelib_object->is_constructed = TRUE;
 
 	typelib_object->typelib = g_base_info_get_typelib(baseinfo_object->info);
@@ -318,18 +318,18 @@ PHP_METHOD(BaseInfo, getTypelib)
 PHP_METHOD(BaseInfo, equal)
 {
 
-	gi_baseinfo_object *baseinfo_object1;
-	gi_baseinfo_object *baseinfo_object2;
+	gintrospection_baseinfo_object *baseinfo_object1;
+	gintrospection_baseinfo_object *baseinfo_object2;
 	zval *object;
 
-	PHP_GI_EXCEPTIONS
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &object, ce_gi_baseinfo)) {
+	PHP_GINTROSPECTION_EXCEPTIONS
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &object, ce_gintrospection_baseinfo)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object1 = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
-	baseinfo_object2 = (gi_baseinfo_object *) zend_object_store_get_object(object TSRMLS_CC);
+	baseinfo_object1 = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object2 = (gintrospection_baseinfo_object *) zend_object_store_get_object(object TSRMLS_CC);
 
 	RETURN_BOOL(g_base_info_equal(baseinfo_object1->info, baseinfo_object2->info));
 }
@@ -344,16 +344,16 @@ PHP_METHOD(BaseInfo, equal)
 PHP_METHOD(RegisteredTypeInfo, getGTypeName)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	const gchar * name;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	name = g_registered_type_info_get_type_name(baseinfo_object->info);
 
@@ -369,16 +369,16 @@ PHP_METHOD(RegisteredTypeInfo, getGTypeName)
 PHP_METHOD(RegisteredTypeInfo, getTypeInit)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	const gchar * name;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	name = g_registered_type_info_get_type_init(baseinfo_object->info);
 
@@ -405,15 +405,15 @@ ZEND_END_ARG_INFO()
 PHP_METHOD(EnumInfo, getNumValues)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_LONG(g_enum_info_get_n_values(baseinfo_object->info));
 }
@@ -425,18 +425,18 @@ PHP_METHOD(EnumInfo, getNumValues)
 PHP_METHOD(EnumInfo, getValue)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	long index;
 	gint total;
 	GIBaseInfo *info;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &index)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	total = g_enum_info_get_n_values(baseinfo_object->info);
 
@@ -457,8 +457,8 @@ PHP_METHOD(EnumInfo, getValue)
 		RETURN_NULL();
 	}
 
-	object_init_ex(return_value, ce_gi_valueinfo);
-	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, ce_gintrospection_valueinfo);
+	baseinfo_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	baseinfo_object->is_constructed = TRUE;
 	baseinfo_object->info = g_base_info_ref(info);
 }
@@ -469,22 +469,22 @@ PHP_METHOD(EnumInfo, getValue)
 PHP_METHOD(EnumInfo, getValues)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	gint total, i;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 	total = g_enum_info_get_n_values(baseinfo_object->info);
 
 	array_init(return_value);
 
 	for (i = 0; i < total; i++) {
-		gi_baseinfo_object *nested_object;
+		gintrospection_baseinfo_object *nested_object;
 		zval *zinfo;
 		GIBaseInfo *info = NULL;
 
@@ -494,8 +494,8 @@ PHP_METHOD(EnumInfo, getValues)
 			continue;
 		} else {
 			MAKE_STD_ZVAL(zinfo);
-			object_init_ex(zinfo, ce_gi_valueinfo);
-			nested_object = (gi_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
+			object_init_ex(zinfo, ce_gintrospection_valueinfo);
+			nested_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
 			nested_object->is_constructed = TRUE;
 			nested_object->info = g_base_info_ref(info);
 			add_next_index_zval(return_value, zinfo);
@@ -509,15 +509,15 @@ PHP_METHOD(EnumInfo, getValues)
 PHP_METHOD(EnumInfo, getNumMethods)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_LONG(g_enum_info_get_n_methods(baseinfo_object->info));
 }
@@ -529,18 +529,18 @@ PHP_METHOD(EnumInfo, getNumMethods)
 PHP_METHOD(EnumInfo, getMethod)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	long index;
 	gint total;
 	GIBaseInfo *info = NULL;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &index)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	total = g_enum_info_get_n_methods(baseinfo_object->info);
 
@@ -561,8 +561,8 @@ PHP_METHOD(EnumInfo, getMethod)
 		RETURN_NULL();
 	}
 
-	object_init_ex(return_value, ce_gi_functioninfo);
-	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, ce_gintrospection_functioninfo);
+	baseinfo_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	baseinfo_object->is_constructed = TRUE;
 	baseinfo_object->info = g_base_info_ref(info);
 }
@@ -573,22 +573,22 @@ PHP_METHOD(EnumInfo, getMethod)
 PHP_METHOD(EnumInfo, getMethods)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	gint total, i;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 	total = g_enum_info_get_n_methods(baseinfo_object->info);
 
 	array_init(return_value);
 
 	for (i = 0; i < total; i++) {
-		gi_baseinfo_object *child_object;
+		gintrospection_baseinfo_object *child_object;
 		zval *zinfo;
 		GIBaseInfo *info = NULL;
 
@@ -598,8 +598,8 @@ PHP_METHOD(EnumInfo, getMethods)
 			continue;
 		} else {
 			MAKE_STD_ZVAL(zinfo);
-			object_init_ex(zinfo, ce_gi_functioninfo);
-			child_object = (gi_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
+			object_init_ex(zinfo, ce_gintrospection_functioninfo);
+			child_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
 			child_object->is_constructed = TRUE;
 			child_object->info = g_base_info_ref(info);
 			add_next_index_zval(return_value, zinfo);
@@ -614,22 +614,22 @@ PHP_METHOD(EnumInfo, getMethods)
 PHP_METHOD(EnumInfo, getStorageType)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	GITypeTag type;
 	const gchar *name;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	type = g_enum_info_get_storage_type(baseinfo_object->info);
 
-	object_init_ex(return_value, ce_gi_typetag);
-	php_g_set_enum_value(&return_value, type TSRMLS_CC);
+	object_init_ex(return_value, ce_gintrospection_typetag);
+	php_glib_set_enum_value(&return_value, type TSRMLS_CC);
 }
 /* }}} */
 
@@ -644,17 +644,17 @@ PHP_METHOD(EnumInfo, getStorageType)
 PHP_METHOD(ValueInfo, getValue)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	gchar *value;
 	gint64 item;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	item = g_value_info_get_value(baseinfo_object->info);
 
@@ -685,15 +685,15 @@ ZEND_END_ARG_INFO()
 PHP_METHOD(StructInfo, getNumFields)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_LONG(g_struct_info_get_n_fields(baseinfo_object->info));
 }
@@ -705,18 +705,18 @@ PHP_METHOD(StructInfo, getNumFields)
 PHP_METHOD(StructInfo, getField)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	long index;
 	gint total;
 	GIBaseInfo *info = NULL;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &index)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	total = g_struct_info_get_n_fields(baseinfo_object->info);
 
@@ -737,8 +737,8 @@ PHP_METHOD(StructInfo, getField)
 		RETURN_NULL();
 	}
 
-	object_init_ex(return_value, ce_gi_fieldinfo);
-	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, ce_gintrospection_fieldinfo);
+	baseinfo_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	baseinfo_object->is_constructed = TRUE;
 	baseinfo_object->info = g_base_info_ref(info);
 }
@@ -749,22 +749,22 @@ PHP_METHOD(StructInfo, getField)
 PHP_METHOD(StructInfo, getFields)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	gint total, i;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 	total = g_struct_info_get_n_fields(baseinfo_object->info);
 
 	array_init(return_value);
 
 	for (i = 0; i < total; i++) {
-		gi_baseinfo_object *child_object;
+		gintrospection_baseinfo_object *child_object;
 		zval *zinfo;
 		GIBaseInfo *info = NULL;
 
@@ -774,8 +774,8 @@ PHP_METHOD(StructInfo, getFields)
 			continue;
 		} else {
 			MAKE_STD_ZVAL(zinfo);
-			object_init_ex(zinfo, ce_gi_fieldinfo);
-			child_object = (gi_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
+			object_init_ex(zinfo, ce_gintrospection_fieldinfo);
+			child_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
 			child_object->is_constructed = TRUE;
 			child_object->info = g_base_info_ref(info);
 			add_next_index_zval(return_value, zinfo);
@@ -790,15 +790,15 @@ PHP_METHOD(StructInfo, getFields)
 PHP_METHOD(StructInfo, getNumMethods)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_LONG(g_struct_info_get_n_methods(baseinfo_object->info));
 }
@@ -810,18 +810,18 @@ PHP_METHOD(StructInfo, getNumMethods)
 PHP_METHOD(StructInfo, getMethod)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	long index;
 	gint total;
 	GIBaseInfo *info = NULL;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &index)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	total = g_struct_info_get_n_methods(baseinfo_object->info);
 
@@ -842,8 +842,8 @@ PHP_METHOD(StructInfo, getMethod)
 		RETURN_NULL();
 	}
 
-	object_init_ex(return_value, ce_gi_functioninfo);
-	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, ce_gintrospection_functioninfo);
+	baseinfo_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	baseinfo_object->is_constructed = TRUE;
 	baseinfo_object->info = g_base_info_ref(info);
 }
@@ -854,22 +854,22 @@ PHP_METHOD(StructInfo, getMethod)
 PHP_METHOD(StructInfo, getMethods)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	gint total, i;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 	total = g_struct_info_get_n_methods(baseinfo_object->info);
 
 	array_init(return_value);
 
 	for (i = 0; i < total; i++) {
-		gi_baseinfo_object *child_object;
+		gintrospection_baseinfo_object *child_object;
 		zval *zinfo;
 		GIBaseInfo *info = NULL;
 
@@ -879,8 +879,8 @@ PHP_METHOD(StructInfo, getMethods)
 			continue;
 		} else {
 			MAKE_STD_ZVAL(zinfo);
-			object_init_ex(zinfo, ce_gi_functioninfo);
-			child_object = (gi_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
+			object_init_ex(zinfo, ce_gintrospection_functioninfo);
+			child_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
 			child_object->is_constructed = TRUE;
 			child_object->info = g_base_info_ref(info);
 			add_next_index_zval(return_value, zinfo);
@@ -895,18 +895,18 @@ PHP_METHOD(StructInfo, getMethods)
 PHP_METHOD(StructInfo, findMethod)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	char* name;
 	int name_len;
 	GIBaseInfo *info = NULL;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	info = g_struct_info_find_method(baseinfo_object->info, name);
 
@@ -914,8 +914,8 @@ PHP_METHOD(StructInfo, findMethod)
 		RETURN_NULL();
 	}
 
-	object_init_ex(return_value, ce_gi_functioninfo);
-	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, ce_gintrospection_functioninfo);
+	baseinfo_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	baseinfo_object->is_constructed = TRUE;
 	baseinfo_object->info = g_base_info_ref(info);
 }
@@ -927,17 +927,17 @@ PHP_METHOD(StructInfo, findMethod)
 PHP_METHOD(StructInfo, getSize)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	gchar *value;
 	gsize item;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	item = g_struct_info_get_size(baseinfo_object->info);
 
@@ -953,17 +953,17 @@ PHP_METHOD(StructInfo, getSize)
 PHP_METHOD(StructInfo, getAlignment)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	gchar *value;
 	gsize item;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	item = g_struct_info_get_alignment(baseinfo_object->info);
 
@@ -978,15 +978,15 @@ PHP_METHOD(StructInfo, getAlignment)
 PHP_METHOD(StructInfo, isGTypeStruct)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_BOOL(g_struct_info_is_gtype_struct(baseinfo_object->info));
 }
@@ -996,15 +996,15 @@ PHP_METHOD(StructInfo, isGTypeStruct)
 PHP_METHOD(StructInfo, isForeign)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_BOOL(g_struct_info_is_foreign(baseinfo_object->info));
 }
@@ -1035,15 +1035,15 @@ ZEND_END_ARG_INFO()
 PHP_METHOD(UnionInfo, getNumFields)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_LONG(g_union_info_get_n_fields(baseinfo_object->info));
 }
@@ -1055,18 +1055,18 @@ PHP_METHOD(UnionInfo, getNumFields)
 PHP_METHOD(UnionInfo, getField)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	long index;
 	gint total;
 	GIBaseInfo *info = NULL;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &index)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	total = g_union_info_get_n_fields(baseinfo_object->info);
 
@@ -1087,8 +1087,8 @@ PHP_METHOD(UnionInfo, getField)
 		RETURN_NULL();
 	}
 
-	object_init_ex(return_value, ce_gi_fieldinfo);
-	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, ce_gintrospection_fieldinfo);
+	baseinfo_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	baseinfo_object->is_constructed = TRUE;
 	baseinfo_object->info = g_base_info_ref(info);
 }
@@ -1099,22 +1099,22 @@ PHP_METHOD(UnionInfo, getField)
 PHP_METHOD(UnionInfo, getFields)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	gint total, i;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 	total = g_union_info_get_n_fields(baseinfo_object->info);
 
 	array_init(return_value);
 
 	for (i = 0; i < total; i++) {
-		gi_baseinfo_object *child_object;
+		gintrospection_baseinfo_object *child_object;
 		zval *zinfo;
 		GIBaseInfo *info = NULL;
 
@@ -1124,8 +1124,8 @@ PHP_METHOD(UnionInfo, getFields)
 			continue;
 		} else {
 			MAKE_STD_ZVAL(zinfo);
-			object_init_ex(zinfo, ce_gi_fieldinfo);
-			child_object = (gi_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
+			object_init_ex(zinfo, ce_gintrospection_fieldinfo);
+			child_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
 			child_object->is_constructed = TRUE;
 			child_object->info = g_base_info_ref(info);
 			add_next_index_zval(return_value, zinfo);
@@ -1140,15 +1140,15 @@ PHP_METHOD(UnionInfo, getFields)
 PHP_METHOD(UnionInfo, getNumMethods)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_LONG(g_union_info_get_n_methods(baseinfo_object->info));
 }
@@ -1160,18 +1160,18 @@ PHP_METHOD(UnionInfo, getNumMethods)
 PHP_METHOD(UnionInfo, getMethod)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	long index;
 	gint total;
 	GIBaseInfo *info = NULL;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &index)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	total = g_union_info_get_n_methods(baseinfo_object->info);
 
@@ -1192,8 +1192,8 @@ PHP_METHOD(UnionInfo, getMethod)
 		RETURN_NULL();
 	}
 
-	object_init_ex(return_value, ce_gi_functioninfo);
-	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, ce_gintrospection_functioninfo);
+	baseinfo_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	baseinfo_object->is_constructed = TRUE;
 	baseinfo_object->info = g_base_info_ref(info);
 }
@@ -1204,22 +1204,22 @@ PHP_METHOD(UnionInfo, getMethod)
 PHP_METHOD(UnionInfo, getMethods)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	gint total, i;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 	total = g_union_info_get_n_methods(baseinfo_object->info);
 
 	array_init(return_value);
 
 	for (i = 0; i < total; i++) {
-		gi_baseinfo_object *child_object;
+		gintrospection_baseinfo_object *child_object;
 		zval *zinfo;
 		GIBaseInfo *info = NULL;
 
@@ -1229,8 +1229,8 @@ PHP_METHOD(UnionInfo, getMethods)
 			continue;
 		} else {
 			MAKE_STD_ZVAL(zinfo);
-			object_init_ex(zinfo, ce_gi_functioninfo);
-			child_object = (gi_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
+			object_init_ex(zinfo, ce_gintrospection_functioninfo);
+			child_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(zinfo TSRMLS_CC);
 			child_object->is_constructed = TRUE;
 			child_object->info = g_base_info_ref(info);
 			add_next_index_zval(return_value, zinfo);
@@ -1245,15 +1245,15 @@ PHP_METHOD(UnionInfo, getMethods)
 PHP_METHOD(UnionInfo, isDiscriminated)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_BOOL(g_union_info_is_discriminated(baseinfo_object->info));
 }
@@ -1263,15 +1263,15 @@ PHP_METHOD(UnionInfo, isDiscriminated)
 PHP_METHOD(UnionInfo, getDiscriminatorOffset)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_LONG(g_union_info_get_discriminator_offset(baseinfo_object->info));
 }
@@ -1282,16 +1282,16 @@ PHP_METHOD(UnionInfo, getDiscriminatorOffset)
 PHP_METHOD(UnionInfo, getDiscriminatorType)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	GIBaseInfo *info = NULL;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	if (FALSE == g_union_info_is_discriminated(baseinfo_object->info)) {
 		RETURN_NULL();
@@ -1303,8 +1303,8 @@ PHP_METHOD(UnionInfo, getDiscriminatorType)
 		RETURN_NULL();
 	}
 
-	object_init_ex(return_value, ce_gi_typeinfo);
-	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, ce_gintrospection_typeinfo);
+	baseinfo_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	baseinfo_object->is_constructed = TRUE;
 	baseinfo_object->info = g_base_info_ref(info);
 }
@@ -1315,17 +1315,17 @@ PHP_METHOD(UnionInfo, getDiscriminatorType)
 PHP_METHOD(UnionInfo, getDiscriminator)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	long index;
 	GIBaseInfo *info = NULL;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &index)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	info = g_union_info_get_discriminator(baseinfo_object->info, index);
 
@@ -1333,8 +1333,8 @@ PHP_METHOD(UnionInfo, getDiscriminator)
 		RETURN_NULL();
 	}
 
-	object_init_ex(return_value, ce_gi_constantinfo);
-	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, ce_gintrospection_constantinfo);
+	baseinfo_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	baseinfo_object->is_constructed = TRUE;
 	baseinfo_object->info = g_base_info_ref(info);
 }
@@ -1345,18 +1345,18 @@ PHP_METHOD(UnionInfo, getDiscriminator)
 PHP_METHOD(UnionInfo, findMethod)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	char* name;
 	int name_len;
 	GIBaseInfo *info = NULL;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	info = g_union_info_find_method(baseinfo_object->info, name);
 
@@ -1364,8 +1364,8 @@ PHP_METHOD(UnionInfo, findMethod)
 		RETURN_NULL();
 	}
 
-	object_init_ex(return_value, ce_gi_functioninfo);
-	baseinfo_object = (gi_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	object_init_ex(return_value, ce_gintrospection_functioninfo);
+	baseinfo_object = (gintrospection_baseinfo_object *)zend_object_store_get_object(return_value TSRMLS_CC);
 	baseinfo_object->is_constructed = TRUE;
 	baseinfo_object->info = g_base_info_ref(info);
 }
@@ -1377,17 +1377,17 @@ PHP_METHOD(UnionInfo, findMethod)
 PHP_METHOD(UnionInfo, getSize)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	gchar *value;
 	gsize item;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	item = g_union_info_get_size(baseinfo_object->info);
 
@@ -1403,17 +1403,17 @@ PHP_METHOD(UnionInfo, getSize)
 PHP_METHOD(UnionInfo, getAlignment)
 {
 
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 	gchar *value;
 	gsize item;
 
-	PHP_GI_EXCEPTIONS
+	PHP_GINTROSPECTION_EXCEPTIONS
 	if (FAILURE == zend_parse_parameters_none()) {
 		return;
 	}
-	PHP_GI_RESTORE_ERRORS
+	PHP_GINTROSPECTION_RESTORE_ERRORS
 
-	baseinfo_object = (gi_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	item = g_union_info_get_alignment(baseinfo_object->info);
 
@@ -1427,10 +1427,10 @@ PHP_METHOD(UnionInfo, getAlignment)
     G\Introspection\BaseInfo Object management
 ------------------------------------------------------------------*/
 
-/* {{{ gi_baseinfo_object_free */
-static void gi_baseinfo_object_free(void *object TSRMLS_DC)
+/* {{{ gintrospection_baseinfo_object_free */
+static void gintrospection_baseinfo_object_free(void *object TSRMLS_DC)
 {
-	gi_baseinfo_object *baseinfo_object = (gi_baseinfo_object *)object;
+	gintrospection_baseinfo_object *baseinfo_object = (gintrospection_baseinfo_object *)object;
 
 	zend_object_std_dtor(&baseinfo_object->std TSRMLS_CC);
 	baseinfo_object->is_constructed = FALSE;
@@ -1443,13 +1443,13 @@ static void gi_baseinfo_object_free(void *object TSRMLS_DC)
 }
 /* }}} */
 
-/* {{{ gi_baseinfo_object_create */
-static zend_object_value gi_baseinfo_object_create(zend_class_entry *ce TSRMLS_DC)
+/* {{{ gintrospection_baseinfo_object_create */
+static zend_object_value gintrospection_baseinfo_object_create(zend_class_entry *ce TSRMLS_DC)
 {
 	zend_object_value retval;
-	gi_baseinfo_object *baseinfo_object;
+	gintrospection_baseinfo_object *baseinfo_object;
 
-	baseinfo_object = ecalloc(1, sizeof(gi_baseinfo_object));
+	baseinfo_object = ecalloc(1, sizeof(gintrospection_baseinfo_object));
 	zend_object_std_init((zend_object *) baseinfo_object, ce TSRMLS_CC);
 	baseinfo_object->is_constructed = FALSE;
 	baseinfo_object->info = NULL;
@@ -1458,7 +1458,7 @@ static zend_object_value gi_baseinfo_object_create(zend_class_entry *ce TSRMLS_D
 
 	retval.handle = zend_objects_store_put(baseinfo_object,
 		(zend_objects_store_dtor_t) zend_objects_destroy_object,
-		(zend_objects_free_object_storage_t) gi_baseinfo_object_free,
+		(zend_objects_free_object_storage_t) gintrospection_baseinfo_object_free,
 		NULL TSRMLS_CC);
 	retval.handlers = &std_object_handlers;
 	return retval;
@@ -1563,79 +1563,79 @@ static const zend_function_entry gi_unioninfo_methods[] = {
 /* }}} */
 
 /* {{{ PHP_MINIT_FUNCTION */
-PHP_MINIT_FUNCTION(gi_Info)
+PHP_MINIT_FUNCTION(gintrospection_Info)
 {
 	zend_class_entry base_ce, callable_ce, function_ce, signal_ce, vfunc_ce, regtype_ce, enum_ce;
 	zend_class_entry value_ce, property_ce, field_ce;
 	zend_class_entry union_ce, struct_ce, object_ce, interface_ce, arginfo_ce, constant_ce, type_ce;
 
-	INIT_NS_CLASS_ENTRY(base_ce, GI_NAMESPACE, "BaseInfo", gi_baseinfo_methods);
-	ce_gi_baseinfo = zend_register_internal_class(&base_ce TSRMLS_CC);
-	ce_gi_baseinfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(base_ce, GINTROSPECTION_NAMESPACE, "BaseInfo", gi_baseinfo_methods);
+	ce_gintrospection_baseinfo = zend_register_internal_class(&base_ce TSRMLS_CC);
+	ce_gintrospection_baseinfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(callable_ce, GI_NAMESPACE, "CallableInfo", NULL);
-	ce_gi_callableinfo = zend_register_internal_class_ex(&callable_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
-	ce_gi_callableinfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(callable_ce, GINTROSPECTION_NAMESPACE, "CallableInfo", NULL);
+	ce_gintrospection_callableinfo = zend_register_internal_class_ex(&callable_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_callableinfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(function_ce, GI_NAMESPACE, "FunctionInfo", NULL);
-	ce_gi_functioninfo = zend_register_internal_class_ex(&function_ce, ce_gi_callableinfo, NULL TSRMLS_CC);
-	ce_gi_functioninfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(function_ce, GINTROSPECTION_NAMESPACE, "FunctionInfo", NULL);
+	ce_gintrospection_functioninfo = zend_register_internal_class_ex(&function_ce, ce_gintrospection_callableinfo, NULL TSRMLS_CC);
+	ce_gintrospection_functioninfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(signal_ce, GI_NAMESPACE, "SignalInfo", NULL);
-	ce_gi_signalinfo = zend_register_internal_class_ex(&signal_ce, ce_gi_callableinfo, NULL TSRMLS_CC);
-	ce_gi_signalinfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(signal_ce, GINTROSPECTION_NAMESPACE, "SignalInfo", NULL);
+	ce_gintrospection_signalinfo = zend_register_internal_class_ex(&signal_ce, ce_gintrospection_callableinfo, NULL TSRMLS_CC);
+	ce_gintrospection_signalinfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(vfunc_ce, GI_NAMESPACE, "VFuncInfo", NULL);
-	ce_gi_vfuncinfo = zend_register_internal_class_ex(&vfunc_ce, ce_gi_callableinfo, NULL TSRMLS_CC);
-	ce_gi_vfuncinfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(vfunc_ce, GINTROSPECTION_NAMESPACE, "VFuncInfo", NULL);
+	ce_gintrospection_vfuncinfo = zend_register_internal_class_ex(&vfunc_ce, ce_gintrospection_callableinfo, NULL TSRMLS_CC);
+	ce_gintrospection_vfuncinfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(regtype_ce, GI_NAMESPACE, "RegisteredTypeInfo", gi_regtypeinfo_methods);
-	ce_gi_regtypeinfo = zend_register_internal_class_ex(&regtype_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
-	ce_gi_regtypeinfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(regtype_ce, GINTROSPECTION_NAMESPACE, "RegisteredTypeInfo", gi_regtypeinfo_methods);
+	ce_gintrospection_regtypeinfo = zend_register_internal_class_ex(&regtype_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_regtypeinfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(enum_ce, GI_NAMESPACE, "EnumInfo", gi_enuminfo_methods);
-	ce_gi_enuminfo = zend_register_internal_class_ex(&enum_ce, ce_gi_regtypeinfo, NULL TSRMLS_CC);
-	ce_gi_enuminfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(enum_ce, GINTROSPECTION_NAMESPACE, "EnumInfo", gi_enuminfo_methods);
+	ce_gintrospection_enuminfo = zend_register_internal_class_ex(&enum_ce, ce_gintrospection_regtypeinfo, NULL TSRMLS_CC);
+	ce_gintrospection_enuminfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(union_ce, GI_NAMESPACE, "UnionInfo", gi_unioninfo_methods);
-	ce_gi_unioninfo = zend_register_internal_class_ex(&union_ce, ce_gi_regtypeinfo, NULL TSRMLS_CC);
-	ce_gi_unioninfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(union_ce, GINTROSPECTION_NAMESPACE, "UnionInfo", gi_unioninfo_methods);
+	ce_gintrospection_unioninfo = zend_register_internal_class_ex(&union_ce, ce_gintrospection_regtypeinfo, NULL TSRMLS_CC);
+	ce_gintrospection_unioninfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(struct_ce, GI_NAMESPACE, "StructInfo", gi_structinfo_methods);
-	ce_gi_structinfo = zend_register_internal_class_ex(&struct_ce, ce_gi_regtypeinfo, NULL TSRMLS_CC);
-	ce_gi_structinfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(struct_ce, GINTROSPECTION_NAMESPACE, "StructInfo", gi_structinfo_methods);
+	ce_gintrospection_structinfo = zend_register_internal_class_ex(&struct_ce, ce_gintrospection_regtypeinfo, NULL TSRMLS_CC);
+	ce_gintrospection_structinfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(object_ce, GI_NAMESPACE, "ObjectInfo", NULL);
-	ce_gi_objectinfo = zend_register_internal_class_ex(&object_ce, ce_gi_regtypeinfo, NULL TSRMLS_CC);
-	ce_gi_objectinfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(object_ce, GINTROSPECTION_NAMESPACE, "ObjectInfo", NULL);
+	ce_gintrospection_objectinfo = zend_register_internal_class_ex(&object_ce, ce_gintrospection_regtypeinfo, NULL TSRMLS_CC);
+	ce_gintrospection_objectinfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(interface_ce, GI_NAMESPACE, "InterfaceInfo", NULL);
-	ce_gi_interfaceinfo = zend_register_internal_class_ex(&interface_ce, ce_gi_regtypeinfo, NULL TSRMLS_CC);
-	ce_gi_interfaceinfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(interface_ce, GINTROSPECTION_NAMESPACE, "InterfaceInfo", NULL);
+	ce_gintrospection_interfaceinfo = zend_register_internal_class_ex(&interface_ce, ce_gintrospection_regtypeinfo, NULL TSRMLS_CC);
+	ce_gintrospection_interfaceinfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(arginfo_ce, GI_NAMESPACE, "ArgInfo", NULL);
-	ce_gi_arginfo = zend_register_internal_class_ex(&arginfo_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
-	ce_gi_arginfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(arginfo_ce, GINTROSPECTION_NAMESPACE, "ArgInfo", NULL);
+	ce_gintrospection_arginfo = zend_register_internal_class_ex(&arginfo_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_arginfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(constant_ce, GI_NAMESPACE, "ConstantInfo", NULL);
-	ce_gi_constantinfo = zend_register_internal_class_ex(&constant_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
-	ce_gi_constantinfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(constant_ce, GINTROSPECTION_NAMESPACE, "ConstantInfo", NULL);
+	ce_gintrospection_constantinfo = zend_register_internal_class_ex(&constant_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_constantinfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(field_ce, GI_NAMESPACE, "FieldInfo", NULL);
-	ce_gi_fieldinfo = zend_register_internal_class_ex(&field_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
-	ce_gi_fieldinfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(field_ce, GINTROSPECTION_NAMESPACE, "FieldInfo", NULL);
+	ce_gintrospection_fieldinfo = zend_register_internal_class_ex(&field_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_fieldinfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(property_ce, GI_NAMESPACE, "PropertyInfo", NULL);
-	ce_gi_propertyinfo = zend_register_internal_class_ex(&property_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
-	ce_gi_propertyinfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(property_ce, GINTROSPECTION_NAMESPACE, "PropertyInfo", NULL);
+	ce_gintrospection_propertyinfo = zend_register_internal_class_ex(&property_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_propertyinfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(type_ce, GI_NAMESPACE, "TypeInfo", NULL);
-	ce_gi_typeinfo = zend_register_internal_class_ex(&type_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
-	ce_gi_typeinfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(type_ce, GINTROSPECTION_NAMESPACE, "TypeInfo", NULL);
+	ce_gintrospection_typeinfo = zend_register_internal_class_ex(&type_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_typeinfo->create_object = gintrospection_baseinfo_object_create;
 
-	INIT_NS_CLASS_ENTRY(value_ce, GI_NAMESPACE, "ValueInfo", gi_valueinfo_methods);
-	ce_gi_valueinfo = zend_register_internal_class_ex(&value_ce, ce_gi_baseinfo, NULL TSRMLS_CC);
-	ce_gi_valueinfo->create_object = gi_baseinfo_object_create;
+	INIT_NS_CLASS_ENTRY(value_ce, GINTROSPECTION_NAMESPACE, "ValueInfo", gi_valueinfo_methods);
+	ce_gintrospection_valueinfo = zend_register_internal_class_ex(&value_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_valueinfo->create_object = gintrospection_baseinfo_object_create;
 
 	return SUCCESS;
 }
