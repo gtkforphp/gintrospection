@@ -51,7 +51,7 @@ PHP_METHOD(Typelib, getNamespace)
 
 	typelib_object = (gintrospection_typelib_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
-	RETURN_STRING(g_typelib_get_namespace(typelib_object->typelib), 1);
+	RETURN_STRING(g_typelib_get_namespace(typelib_object->typelib));
 }
 /* }}} */
 
@@ -73,24 +73,20 @@ static void gintrospection_typelib_object_free(void *object TSRMLS_DC)
 /* }}} */
 
 /* {{{ gintrospection_typelib_object_create */
-static zend_object_value gintrospection_typelib_object_create(zend_class_entry *ce TSRMLS_DC)
+static zend_object* gintrospection_typelib_object_create(zend_class_entry *ce TSRMLS_DC)
 {
-	zend_object_value retval;
 	gintrospection_typelib_object *typelib_object;
 
-	typelib_object = ecalloc(1, sizeof(gintrospection_typelib_object));
+	typelib_object = ecalloc(1, sizeof(gintrospection_typelib_object)+
+                                sizeof(zend_object_properties_size(ce)));
 	zend_object_std_init((zend_object *) typelib_object, ce TSRMLS_CC);
 	typelib_object->is_constructed = FALSE;
 	typelib_object->typelib = NULL;
 
 	object_properties_init(&typelib_object->std, ce);
 
-	retval.handle = zend_objects_store_put(typelib_object,
-		(zend_objects_store_dtor_t) zend_objects_destroy_object,
-		(zend_objects_free_object_storage_t) gintrospection_typelib_object_free,
-		NULL TSRMLS_CC);
-	retval.handlers = &std_object_handlers;
-	return retval;
+	typelib_object->std.handlers = &std_object_handlers;
+	return &typelib_object->std;
 }
 /* }}} */
 

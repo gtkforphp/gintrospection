@@ -143,7 +143,7 @@ PHP_METHOD(BaseInfo, getTypeName)
 	type = g_base_info_get_type(baseinfo_object->info);
 	name = g_info_type_to_string(type);
 
-	RETURN_STRING(name, 1);
+	RETURN_STRING(name);
 }
 /* }}} */
 
@@ -162,7 +162,7 @@ PHP_METHOD(BaseInfo, getName)
 
 	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
-	RETURN_STRING(g_base_info_get_name(baseinfo_object->info), 1);
+	RETURN_STRING(g_base_info_get_name(baseinfo_object->info));
 }
 /* }}} */
 
@@ -181,7 +181,7 @@ PHP_METHOD(BaseInfo, getNameSpace)
 
 	baseinfo_object = (gintrospection_baseinfo_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
-	RETURN_STRING(g_base_info_get_namespace(baseinfo_object->info), 1);
+	RETURN_STRING(g_base_info_get_namespace(baseinfo_object->info));
 }
 /* }}} */
 
@@ -225,7 +225,7 @@ PHP_METHOD(BaseInfo, getAttribute)
 	value = g_base_info_get_attribute(baseinfo_object->info, name);
 
 	if(value) {
-		RETURN_STRING(value, 1);
+		RETURN_STRING(value);
 	}
 
 }
@@ -250,7 +250,7 @@ PHP_METHOD(BaseInfo, getAttributes)
 
 	array_init(return_value);
 	while (g_base_info_iterate_attributes (baseinfo_object->info, &iter, &name, &value)) {
-		add_assoc_string(return_value, name, value, 1);
+		add_assoc_string(return_value, name, value);
 	}
 
 }
@@ -358,7 +358,7 @@ PHP_METHOD(RegisteredTypeInfo, getGTypeName)
 	name = g_registered_type_info_get_type_name(baseinfo_object->info);
 
 	if (name) {
-		RETURN_STRING(name, 1);
+		RETURN_STRING(name);
 	}
 }
 /* }}} */
@@ -383,7 +383,7 @@ PHP_METHOD(RegisteredTypeInfo, getTypeInit)
 	name = g_registered_type_info_get_type_init(baseinfo_object->info);
 
 	if (name) {
-		RETURN_STRING(name, 1);
+		RETURN_STRING(name);
 	}
 }
 /* }}} */
@@ -659,7 +659,7 @@ PHP_METHOD(ValueInfo, getValue)
 	item = g_value_info_get_value(baseinfo_object->info);
 
 	value = g_strdup_printf("%"G_GINT64_FORMAT, item);
-	RETVAL_STRING(value, 1);
+	RETVAL_STRING(value);
 	g_free(value);
 }
 /* }}} */
@@ -942,7 +942,7 @@ PHP_METHOD(StructInfo, getSize)
 	item = g_struct_info_get_size(baseinfo_object->info);
 
 	value = g_strdup_printf("%"G_GSIZE_FORMAT, item);
-	RETVAL_STRING(value, 1);
+	RETVAL_STRING(value);
 	g_free(value);
 }
 /* }}} */
@@ -968,7 +968,7 @@ PHP_METHOD(StructInfo, getAlignment)
 	item = g_struct_info_get_alignment(baseinfo_object->info);
 
 	value = g_strdup_printf("%"G_GSIZE_FORMAT, item);
-	RETVAL_STRING(value, 1);
+	RETVAL_STRING(value);
 	g_free(value);
 }
 /* }}} */
@@ -1392,7 +1392,7 @@ PHP_METHOD(UnionInfo, getSize)
 	item = g_union_info_get_size(baseinfo_object->info);
 
 	value = g_strdup_printf("%"G_GSIZE_FORMAT, item);
-	RETVAL_STRING(value, 1);
+	RETVAL_STRING(value);
 	g_free(value);
 }
 /* }}} */
@@ -1418,7 +1418,7 @@ PHP_METHOD(UnionInfo, getAlignment)
 	item = g_union_info_get_alignment(baseinfo_object->info);
 
 	value = g_strdup_printf("%"G_GSIZE_FORMAT, item);
-	RETVAL_STRING(value, 1);
+	RETVAL_STRING(value);
 	g_free(value);
 }
 /* }}} */
@@ -1444,24 +1444,21 @@ static void gintrospection_baseinfo_object_free(void *object TSRMLS_DC)
 /* }}} */
 
 /* {{{ gintrospection_baseinfo_object_create */
-static zend_object_value gintrospection_baseinfo_object_create(zend_class_entry *ce TSRMLS_DC)
+static zend_object* gintrospection_baseinfo_object_create(zend_class_entry *ce TSRMLS_DC)
 {
-	zend_object_value retval;
 	gintrospection_baseinfo_object *baseinfo_object;
 
-	baseinfo_object = ecalloc(1, sizeof(gintrospection_baseinfo_object));
+	baseinfo_object = ecalloc(1, sizeof(gintrospection_baseinfo_object)+
+                                 sizeof(zend_object_properties_size(ce)));
 	zend_object_std_init((zend_object *) baseinfo_object, ce TSRMLS_CC);
 	baseinfo_object->is_constructed = FALSE;
 	baseinfo_object->info = NULL;
 
 	object_properties_init(&baseinfo_object->std, ce);
 
-	retval.handle = zend_objects_store_put(baseinfo_object,
-		(zend_objects_store_dtor_t) zend_objects_destroy_object,
-		(zend_objects_free_object_storage_t) gintrospection_baseinfo_object_free,
-		NULL TSRMLS_CC);
-	retval.handlers = &std_object_handlers;
-	return retval;
+
+    baseinfo_object->std.handlers = &std_object_handlers;
+    return &baseinfo_object->std;
 }
 /* }}} */
 
@@ -1574,67 +1571,67 @@ PHP_MINIT_FUNCTION(gintrospection_Info)
 	ce_gintrospection_baseinfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(callable_ce, GINTROSPECTION_NAMESPACE, "CallableInfo", NULL);
-	ce_gintrospection_callableinfo = zend_register_internal_class_ex(&callable_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_callableinfo = zend_register_internal_class_ex(&callable_ce, ce_gintrospection_baseinfo);
 	ce_gintrospection_callableinfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(function_ce, GINTROSPECTION_NAMESPACE, "FunctionInfo", NULL);
-	ce_gintrospection_functioninfo = zend_register_internal_class_ex(&function_ce, ce_gintrospection_callableinfo, NULL TSRMLS_CC);
+	ce_gintrospection_functioninfo = zend_register_internal_class_ex(&function_ce, ce_gintrospection_callableinfo);
 	ce_gintrospection_functioninfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(signal_ce, GINTROSPECTION_NAMESPACE, "SignalInfo", NULL);
-	ce_gintrospection_signalinfo = zend_register_internal_class_ex(&signal_ce, ce_gintrospection_callableinfo, NULL TSRMLS_CC);
+	ce_gintrospection_signalinfo = zend_register_internal_class_ex(&signal_ce, ce_gintrospection_callableinfo);
 	ce_gintrospection_signalinfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(vfunc_ce, GINTROSPECTION_NAMESPACE, "VFuncInfo", NULL);
-	ce_gintrospection_vfuncinfo = zend_register_internal_class_ex(&vfunc_ce, ce_gintrospection_callableinfo, NULL TSRMLS_CC);
+	ce_gintrospection_vfuncinfo = zend_register_internal_class_ex(&vfunc_ce, ce_gintrospection_callableinfo);
 	ce_gintrospection_vfuncinfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(regtype_ce, GINTROSPECTION_NAMESPACE, "RegisteredTypeInfo", gi_regtypeinfo_methods);
-	ce_gintrospection_regtypeinfo = zend_register_internal_class_ex(&regtype_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_regtypeinfo = zend_register_internal_class_ex(&regtype_ce, ce_gintrospection_baseinfo);
 	ce_gintrospection_regtypeinfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(enum_ce, GINTROSPECTION_NAMESPACE, "EnumInfo", gi_enuminfo_methods);
-	ce_gintrospection_enuminfo = zend_register_internal_class_ex(&enum_ce, ce_gintrospection_regtypeinfo, NULL TSRMLS_CC);
+	ce_gintrospection_enuminfo = zend_register_internal_class_ex(&enum_ce, ce_gintrospection_regtypeinfo);
 	ce_gintrospection_enuminfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(union_ce, GINTROSPECTION_NAMESPACE, "UnionInfo", gi_unioninfo_methods);
-	ce_gintrospection_unioninfo = zend_register_internal_class_ex(&union_ce, ce_gintrospection_regtypeinfo, NULL TSRMLS_CC);
+	ce_gintrospection_unioninfo = zend_register_internal_class_ex(&union_ce, ce_gintrospection_regtypeinfo);
 	ce_gintrospection_unioninfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(struct_ce, GINTROSPECTION_NAMESPACE, "StructInfo", gi_structinfo_methods);
-	ce_gintrospection_structinfo = zend_register_internal_class_ex(&struct_ce, ce_gintrospection_regtypeinfo, NULL TSRMLS_CC);
+	ce_gintrospection_structinfo = zend_register_internal_class_ex(&struct_ce, ce_gintrospection_regtypeinfo);
 	ce_gintrospection_structinfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(object_ce, GINTROSPECTION_NAMESPACE, "ObjectInfo", NULL);
-	ce_gintrospection_objectinfo = zend_register_internal_class_ex(&object_ce, ce_gintrospection_regtypeinfo, NULL TSRMLS_CC);
+	ce_gintrospection_objectinfo = zend_register_internal_class_ex(&object_ce, ce_gintrospection_regtypeinfo);
 	ce_gintrospection_objectinfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(interface_ce, GINTROSPECTION_NAMESPACE, "InterfaceInfo", NULL);
-	ce_gintrospection_interfaceinfo = zend_register_internal_class_ex(&interface_ce, ce_gintrospection_regtypeinfo, NULL TSRMLS_CC);
+	ce_gintrospection_interfaceinfo = zend_register_internal_class_ex(&interface_ce, ce_gintrospection_regtypeinfo);
 	ce_gintrospection_interfaceinfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(arginfo_ce, GINTROSPECTION_NAMESPACE, "ArgInfo", NULL);
-	ce_gintrospection_arginfo = zend_register_internal_class_ex(&arginfo_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_arginfo = zend_register_internal_class_ex(&arginfo_ce, ce_gintrospection_baseinfo);
 	ce_gintrospection_arginfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(constant_ce, GINTROSPECTION_NAMESPACE, "ConstantInfo", NULL);
-	ce_gintrospection_constantinfo = zend_register_internal_class_ex(&constant_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_constantinfo = zend_register_internal_class_ex(&constant_ce, ce_gintrospection_baseinfo);
 	ce_gintrospection_constantinfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(field_ce, GINTROSPECTION_NAMESPACE, "FieldInfo", NULL);
-	ce_gintrospection_fieldinfo = zend_register_internal_class_ex(&field_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_fieldinfo = zend_register_internal_class_ex(&field_ce, ce_gintrospection_baseinfo);
 	ce_gintrospection_fieldinfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(property_ce, GINTROSPECTION_NAMESPACE, "PropertyInfo", NULL);
-	ce_gintrospection_propertyinfo = zend_register_internal_class_ex(&property_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_propertyinfo = zend_register_internal_class_ex(&property_ce, ce_gintrospection_baseinfo);
 	ce_gintrospection_propertyinfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(type_ce, GINTROSPECTION_NAMESPACE, "TypeInfo", NULL);
-	ce_gintrospection_typeinfo = zend_register_internal_class_ex(&type_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_typeinfo = zend_register_internal_class_ex(&type_ce, ce_gintrospection_baseinfo);
 	ce_gintrospection_typeinfo->create_object = gintrospection_baseinfo_object_create;
 
 	INIT_NS_CLASS_ENTRY(value_ce, GINTROSPECTION_NAMESPACE, "ValueInfo", gi_valueinfo_methods);
-	ce_gintrospection_valueinfo = zend_register_internal_class_ex(&value_ce, ce_gintrospection_baseinfo, NULL TSRMLS_CC);
+	ce_gintrospection_valueinfo = zend_register_internal_class_ex(&value_ce, ce_gintrospection_baseinfo);
 	ce_gintrospection_valueinfo->create_object = gintrospection_baseinfo_object_create;
 
 	return SUCCESS;

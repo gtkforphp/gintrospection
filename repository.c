@@ -172,7 +172,7 @@ PHP_METHOD(Repository, getSearchPath)
 	{
 		data = g_slist_nth_data(list, i);
 
-		add_next_index_string(return_value, (char *) data, 1);
+		add_next_index_string(return_value, (char *) data);
 	}
 }
 /* }}} */
@@ -362,7 +362,7 @@ PHP_METHOD(Repository, getDependencies)
 
 	if (NULL != dependencies) {
 		for (i = 0; dependencies[i] != NULL; i++) {
-			add_next_index_string(return_value, dependencies[i], 1);
+			add_next_index_string(return_value, dependencies[i]);
 			g_free(dependencies[i]);
 		}
 	
@@ -392,7 +392,7 @@ PHP_METHOD(Repository, getLoadedNamespaces)
 
 	array_init(return_value);
 	for (i = 0; namespaces[i] != NULL; i++) {
-		add_next_index_string(return_value, namespaces[i], 1);
+		add_next_index_string(return_value, namespaces[i]);
 		g_free(namespaces[i]);
 	}
 
@@ -561,7 +561,7 @@ PHP_METHOD(Repository, getTypelibPath)
 		return;
 	}
 
-	RETURN_STRING(g_irepository_get_typelib_path(repository_object->repo, name), 1);
+	RETURN_STRING(g_irepository_get_typelib_path(repository_object->repo, name));
 }
 /* }}} */
 
@@ -596,7 +596,7 @@ PHP_METHOD(Repository, getSharedLibrary)
 	if(NULL == path) {
 		RETURN_NULL();
 	} else {
-		RETURN_STRING(path, 1);
+		RETURN_STRING(path);
 	}
 }
 /* }}} */
@@ -625,7 +625,7 @@ PHP_METHOD(Repository, getVersion)
 		return;
 	}
 
-	RETURN_STRING(g_irepository_get_version(repository_object->repo, name), 1);
+	RETURN_STRING(g_irepository_get_version(repository_object->repo, name));
 }
 /* }}} */
 
@@ -653,7 +653,7 @@ PHP_METHOD(Repository, getCPrefix)
 		return;
 	}
 
-	RETURN_STRING(g_irepository_get_c_prefix(repository_object->repo, name), 1);
+	RETURN_STRING(g_irepository_get_c_prefix(repository_object->repo, name));
 }
 /* }}} */
 
@@ -711,7 +711,7 @@ PHP_METHOD(Repository, enumerateVersions)
 	array_init(return_value);
 
 	for (item = versions; item; item = item->next) {
-		add_next_index_string(return_value, item->data, 1);
+		add_next_index_string(return_value, item->data);
 	}
 
 	g_list_free(versions);
@@ -736,24 +736,20 @@ static void gintrospection_repository_object_free(void *object TSRMLS_DC)
 /* }}} */
 
 /* {{{ gintrospection_repository_object_create */
-static zend_object_value gintrospection_repository_object_create(zend_class_entry *ce TSRMLS_DC)
+static zend_object* gintrospection_repository_object_create(zend_class_entry *ce TSRMLS_DC)
 {
-	zend_object_value retval;
 	gintrospection_repository_object *repository_object;
 
-	repository_object = ecalloc(1, sizeof(gintrospection_repository_object));
+	repository_object = ecalloc(1, sizeof(gintrospection_repository_object)+
+                                   sizeof(zend_objecT_properties_size(ce)));
 	zend_object_std_init((zend_object *) repository_object, ce TSRMLS_CC);
 	repository_object->is_constructed = FALSE;
 	repository_object->repo = NULL;
 
 	object_properties_init(&repository_object->std, ce);
 
-	retval.handle = zend_objects_store_put(repository_object,
-		(zend_objects_store_dtor_t) zend_objects_destroy_object,
-		(zend_objects_free_object_storage_t) gintrospection_repository_object_free,
-		NULL TSRMLS_CC);
-	retval.handlers = &gintrospection_repository_object_handlers;
-	return retval;
+	repository_object->std.handlers = &gintrospection_repository_object_handlers;
+	return &repository_object->std;
 }
 /* }}} */
 

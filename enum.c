@@ -36,7 +36,7 @@ PHP_MINIT_FUNCTION(gintrospection_Enums)
 	zend_class_entry flags_ce;
 
 	INIT_NS_CLASS_ENTRY(error_ce, ZEND_NS_NAME(GINTROSPECTION_NAMESPACE, "Repository"), "Error", NULL);
-	ce_gintrospection_repositoryerror = zend_register_internal_class_ex(&error_ce, ce_glib_enum, NULL TSRMLS_CC);
+	ce_gintrospection_repositoryerror = zend_register_internal_class_ex(&error_ce, ce_glib_enum);
 
 	REGISTER_ENUM_CONST("TYPELIB_NOT_FOUND", G_IREPOSITORY_ERROR_TYPELIB_NOT_FOUND, ce_gintrospection_repositoryerror);
 	REGISTER_ENUM_CONST("NAMESPACE_MISMATCH", G_IREPOSITORY_ERROR_NAMESPACE_MISMATCH, ce_gintrospection_repositoryerror);
@@ -44,12 +44,12 @@ PHP_MINIT_FUNCTION(gintrospection_Enums)
 	REGISTER_ENUM_CONST("LIBRARY_NOT_FOUND", G_IREPOSITORY_ERROR_LIBRARY_NOT_FOUND, ce_gintrospection_repositoryerror);
 
 	INIT_NS_CLASS_ENTRY(lazy_ce, ZEND_NS_NAME(GINTROSPECTION_NAMESPACE, "Repository"), "LoadFlags", NULL);
-	ce_gintrospection_repositoryloadflags = zend_register_internal_class_ex(&lazy_ce, ce_glib_enum, NULL TSRMLS_CC);
+	ce_gintrospection_repositoryloadflags = zend_register_internal_class_ex(&lazy_ce, ce_glib_enum);
 
 	REGISTER_ENUM_CONST("LAZY", G_IREPOSITORY_LOAD_FLAG_LAZY, ce_gintrospection_repositoryloadflags);
 
 	INIT_NS_CLASS_ENTRY(info_ce, GINTROSPECTION_NAMESPACE, "InfoType", NULL);
-	ce_gintrospection_infotype = zend_register_internal_class_ex(&info_ce, ce_glib_enum, NULL TSRMLS_CC);
+	ce_gintrospection_infotype = zend_register_internal_class_ex(&info_ce, ce_glib_enum);
 
 	REGISTER_ENUM_CONST("INVALID", GI_INFO_TYPE_INVALID, ce_gintrospection_infotype);
 	REGISTER_ENUM_CONST("FUNCTION", GI_INFO_TYPE_FUNCTION, ce_gintrospection_infotype);
@@ -72,7 +72,7 @@ PHP_MINIT_FUNCTION(gintrospection_Enums)
 	REGISTER_ENUM_CONST("UNRESOLVED", GI_INFO_TYPE_UNRESOLVED, ce_gintrospection_infotype);
 
 	INIT_NS_CLASS_ENTRY(flags_ce, ZEND_NS_NAME(GINTROSPECTION_NAMESPACE, "VFuncInfo"), "Flags", NULL);
-	ce_gintrospection_vfuncinfoflags = zend_register_internal_class_ex(&flags_ce, ce_glib_enum, NULL TSRMLS_CC);
+	ce_gintrospection_vfuncinfoflags = zend_register_internal_class_ex(&flags_ce, ce_glib_enum);
 
 	REGISTER_ENUM_CONST("MUST_CHAIN_UP", GI_VFUNC_MUST_CHAIN_UP, ce_gintrospection_vfuncinfoflags);
 	REGISTER_ENUM_CONST("MUST_OVERRIDE", GI_VFUNC_MUST_OVERRIDE, ce_gintrospection_vfuncinfoflags);
@@ -80,7 +80,7 @@ PHP_MINIT_FUNCTION(gintrospection_Enums)
 	REGISTER_ENUM_CONST("THROWS", GI_VFUNC_THROWS, ce_gintrospection_vfuncinfoflags);
 
 	INIT_NS_CLASS_ENTRY(tags_ce, ZEND_NS_NAME(GINTROSPECTION_NAMESPACE, "TypeInfo"), "Tag", NULL);
-	ce_gintrospection_typetag = zend_register_internal_class_ex(&tags_ce, ce_glib_enum, NULL TSRMLS_CC);
+	ce_gintrospection_typetag = zend_register_internal_class_ex(&tags_ce, ce_glib_enum);
 
 	REGISTER_ENUM_CONST("VOID", GI_TYPE_TAG_VOID, ce_gintrospection_typetag);
 	REGISTER_ENUM_CONST("BOOLEAN", GI_TYPE_TAG_BOOLEAN, ce_gintrospection_typetag);
